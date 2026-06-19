@@ -31,8 +31,9 @@
         <span class="sr-only">Open navigation</span>
       </button>
       <div class="nav-actions">
-        <a class="button button-secondary nav-login" href="login.html">Login</a>
-        <a class="button button-accent" href="register.html">Register</a>
+        <a class="button button-secondary" href="#" onclick="handleLogout()" data-auth="protected" style="display: none;">Logout</a>
+        <a class="button button-secondary nav-login" href="login.html" data-auth="guest">Login</a>
+        <a class="button button-accent" href="register.html" data-auth="guest">Register</a>
       </div>
       <nav class="site-nav" id="primary-navigation">
         <a href="index.html">Home</a>
@@ -69,6 +70,7 @@
           <div class="sidebar-group">
             <p class="sidebar-label">Admin</p>
             <nav class="sidebar-nav">
+              <a href="#accounts">Manage Accounts</a>
               <a href="#reports">Reports</a>
               <a href="#settings">Settings</a>
             </nav>
@@ -289,20 +291,86 @@
           </div>
 
           <div class="dashboard-grid-two">
+            <article class="dashboard-card" id="accounts">
+              <div class="dashboard-card-head">
+                <h2>Manage Accounts</h2>
+                <a class="button button-secondary" href="#settings">Access Control</a>
+              </div>
+              <div class="batch-list">
+                <div class="batch-row">
+                  <div class="batch-meta">
+                    <div class="batch-id">Nurse Reyes</div>
+                    <div class="batch-name">Senior Staff / Administrator</div>
+                  </div>
+                  <div class="topbar-actions">
+                    <button class="button button-secondary" style="min-height: 2.2rem; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Rename</button>
+                    <button class="button button-secondary" style="min-height: 2.2rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; color: #cc3300;">Remove</button>
+                  </div>
+                </div>
+                <div class="batch-row">
+                  <div class="batch-meta">
+                    <div class="batch-id">Dr. Santos</div>
+                    <div class="batch-name">Medical Reviewer</div>
+                  </div>
+                  <div class="topbar-actions">
+                    <button class="button button-secondary" style="min-height: 2.2rem; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Rename</button>
+                    <button class="button button-secondary" style="min-height: 2.2rem; padding: 0.4rem 0.8rem; font-size: 0.8rem; color: #cc3300;">Remove</button>
+                  </div>
+                </div>
+              </div>
+              <div class="stack-top">
+                <button class="button button-primary" style="width: 100%;">+ Add New Staff member</button>
+              </div>
+            </article>
+
             <article class="dashboard-card" id="reports">
               <div class="dashboard-card-head">
-                <h2>Reports</h2>
-                <a class="button button-secondary" href="#dashboard">Review</a>
+                <h2>Reports & Analytics</h2>
+                <div class="topbar-actions">
+                  <button class="button button-secondary" style="min-height: 2.2rem; padding: 0.4rem 0.8rem; font-size: 0.8rem;">Export CSV</button>
+                </div>
               </div>
-              <div class="feature-list">
-                <article>
-                  <h3>Daily log</h3>
-                  <p>5 new batches logged, 2 requests escalated, and 1 route completed.</p>
+              <div class="feature-list" style="margin-top: 0.5rem;">
+                <article style="padding: 1rem; border-radius: 12px; background: var(--shade);">
+                  <h3 style="font-size: 0.95rem; margin-bottom: 0.4rem;">Donation Volumes</h3>
+                  <p style="font-size: 0.85rem;">Total collected: 15,240 mL (This month)</p>
+                  <a href="#" style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">View Trend Analysis →</a>
                 </article>
-                <article>
-                  <h3>Weekly summary</h3>
-                  <p>Inventory stayed above threshold with 18 active batches across all programs.</p>
+                <article style="padding: 1rem; border-radius: 12px; background: var(--shade);">
+                  <h3 style="font-size: 0.95rem; margin-bottom: 0.4rem;">Inventory Status</h3>
+                  <p style="font-size: 0.85rem;">88% Utilization rate / 12% Expiry risk</p>
+                  <a href="#" style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">Generate Stock Report →</a>
                 </article>
+                <article style="padding: 1rem; border-radius: 12px; background: var(--shade);">
+                  <h3 style="font-size: 0.95rem; margin-bottom: 0.4rem;">Distribution Records</h3>
+                  <p style="font-size: 0.85rem;">24 Hospital deliveries completed</p>
+                  <a href="#" style="font-size: 0.8rem; color: var(--primary); font-weight: 700;">Download Log →</a>
+                </article>
+              </div>
+            </article>
+          </div>
+
+          <div class="dashboard-grid-two">
+            <article class="dashboard-card" id="screening-outcomes">
+              <div class="dashboard-card-head">
+                <h2>Screening Outcomes</h2>
+                <a class="button button-secondary" href="#screening">Full View</a>
+              </div>
+              <div class="batch-list">
+                <div class="batch-row">
+                  <div class="batch-meta">
+                    <div class="batch-id">Maria Santos</div>
+                    <div class="batch-name">Serological: Clear | Lifestyle: Low Risk</div>
+                  </div>
+                  <span class="status-pill is-ready">Approved</span>
+                </div>
+                <div class="batch-row">
+                  <div class="batch-meta">
+                    <div class="batch-id">Anna Cruz</div>
+                    <div class="batch-name">Lab Results: Pending Confirmation</div>
+                  </div>
+                  <span class="status-pill is-screened">Review Required</span>
+                </div>
               </div>
             </article>
 
