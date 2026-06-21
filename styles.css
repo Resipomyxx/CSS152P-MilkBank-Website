@@ -1516,6 +1516,12 @@ a {
   color: var(--accent-dark);
 }
 
+.history-marker-gray { background: rgba(120, 120, 120, 0.85); }
+.history-status-warning {
+  background: rgba(120, 120, 120, 0.18);
+  color: #4a4a4a;
+}
+
 .donor-wizard {
   display: grid;
   grid-template-columns: 250px minmax(0, 1fr);
