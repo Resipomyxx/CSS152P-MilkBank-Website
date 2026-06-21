@@ -46,8 +46,10 @@ body::before {
   pointer-events: none;
   background-image: linear-gradient(rgba(23, 49, 59, 0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(23, 49, 59, 0.025) 1px, transparent 1px);
   background-size: 42px 42px;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 80%);
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 80%);
 }
+
 
 img {
   max-width: 100%;
@@ -709,6 +711,7 @@ a {
   margin-bottom: 1.2rem;
   padding: 0.6rem 1.5rem;
   background: rgba(251, 248, 243, 0.82);
+  -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
   border: 1px solid rgba(23, 49, 59, 0.08);
   border-radius: 999px;
@@ -960,6 +963,7 @@ a {
   border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.66);
   border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
@@ -988,6 +992,7 @@ a {
   background: var(--surface);
   border: 1px solid rgba(23, 49, 59, 0.08);
   box-shadow: var(--shadow);
+  -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
@@ -2613,6 +2618,7 @@ a {
     padding-inline: 1.5rem;
     height: 75px;
     background: rgba(255, 255, 255, 0.92);
+    -webkit-backdrop-filter: blur(15px);
     backdrop-filter: blur(15px);
     border: 1px solid var(--line);
     border-radius: 999px;
@@ -2773,9 +2779,7 @@ a {
 }
 
 /* --- Product Carousel --- */
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(18, 87, 77, 0.08);
-}
+/* stray rules removed - merged into .product-carousel-section below */
 
 /* --- Navigation & Button Scaling Fix --- */
 @media (min-width: 860px) {
@@ -2819,6 +2823,8 @@ a {
   padding-block: 3.5rem;
   overflow: hidden;
   background: var(--shade);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(18, 87, 77, 0.08);
 }
 
 .product-carousel-section .section-heading h2 {
@@ -2850,6 +2856,7 @@ a {
   filter: blur(4px);
   opacity: 0.6;
   transform: scale(0.85);
+  -webkit-user-select: none;
   user-select: none;
 }
 
