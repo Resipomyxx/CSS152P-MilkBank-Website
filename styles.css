@@ -2197,11 +2197,22 @@ a {
 }
 
 .product-card {
-  overflow: hidden;
+  /* allow bottom content and shadows to overflow instead of being clipped */
+  overflow: visible;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.82);
   border: 1px solid rgba(23, 49, 59, 0.08);
   box-shadow: var(--shadow);
+}
+
+/* ensure top and bottom sections keep the rounded corners when overflow is visible */
+.product-card-top {
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+.product-card-body {
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
 }
 
 .product-card-top {
@@ -2885,7 +2896,7 @@ a {
   transform: translateY(-10px);
 }
 
-.product-card-body {
+.product-carousel-inner .product-card-body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
