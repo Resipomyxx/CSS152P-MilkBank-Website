@@ -52,5 +52,5 @@ This project is a static front-end build. The items below are currently hardcode
 - The inventory program bars are filled from the hardcoded values in `staff.html`.
 
 ## Notes
-- There is no backend connected yet, so form submissions are still manual or placeholder-only.
+- Backend now WIP
 - If you want this site to be data-driven later, the first step will be replacing repeated content blocks with backend-fed templates or API data.
