@@ -1,4 +1,0 @@
-1 - Home page: transfer button + functionality to main body of the page from header. Also add carousel type of product viewing for user.
-2 - Donor Registration and Consent form: Append Consent Form to Donor Registration as a sort of EULA type of pop-up page.
-3 - Placeholder Emojis - Replace current Placeholder Emojis with actual images.
-4 - Separate branch - Create a separate branch for backend.
