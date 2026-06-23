@@ -61,14 +61,8 @@
         <aside class="products-sidebar" aria-label="Product filters">
           <div class="products-filter-card">
             <h2>Categories</h2>
-            <nav class="products-category-list">
-              <a class="is-active" href="#catalog"><span>All products</span><strong>18</strong></a>
-              <a href="#catalog"><span>Breast pumps</span><strong>4</strong></a>
-              <a href="#catalog"><span>Milk storage</span><strong>3</strong></a>
-              <a href="#catalog"><span>Nursing wear</span><strong>3</strong></a>
-              <a href="#catalog"><span>Lactation support</span><strong>3</strong></a>
-              <a href="#catalog"><span>Comfort &amp; care</span><strong>3</strong></a>
-              <a href="#catalog"><span>Feeding accessories</span><strong>2</strong></a>
+            <nav class="products-category-list" id="category-filters" aria-label="Product category filters">
+              <!-- Category filters generated dynamically -->
             </nav>
           </div>
 
@@ -77,21 +71,19 @@
             <div class="products-price-row">
               <label>
                 <span>Min</span>
-                <input type="number" value="0" aria-label="Minimum price" />
+                <input id="price-min" type="number" value="0" aria-label="Minimum price" />
               </label>
               <label>
                 <span>Max</span>
-                <input type="number" value="5000" aria-label="Maximum price" />
+                <input id="price-max" type="number" value="0" aria-label="Maximum price" />
               </label>
             </div>
           </div>
 
           <div class="products-filter-card">
             <h2>Show only</h2>
-            <nav class="products-toggles" aria-label="Quick filters">
-              <a href="#catalog">New arrivals <strong>3</strong></a>
-              <a href="#catalog">Most popular <strong>5</strong></a>
-              <a href="#catalog">On sale <strong>4</strong></a>
+            <nav class="products-toggles" id="quick-filters" aria-label="Quick filters">
+              <!-- Quick filters generated dynamically -->
             </nav>
           </div>
         </aside>
@@ -107,14 +99,14 @@
           </div>
 
           <div class="products-toolbar">
-            <p><strong>18 products</strong></p>
+            <p><strong id="product-count">0 products</strong></p>
             <label class="products-sort">
               <span>Sort by</span>
-              <select aria-label="Sort products">
-                <option>Featured</option>
-                <option>Popular</option>
-                <option>Price: low to high</option>
-                <option>Price: high to low</option>
+              <select id="sort-select" aria-label="Sort products">
+                <option value="featured">Featured</option>
+                <option value="popular">Popular</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
               </select>
             </label>
           </div>
@@ -124,7 +116,6 @@
           </div>
 
           <script>
-            // Icon mapping for existing products
             const iconMap = {
               'Double electric breast pump': '🍼',
               'Single manual breast pump': '👩‍🍼',
@@ -137,24 +128,129 @@
               'Nursing cover and wrap': '📘'
             };
 
-            async function loadProducts() {
-              const products = await window.supabase.getProducts();
+            const state = {
+              products: [],
+              category: 'All products',
+              quickFilter: 'all',
+              minPrice: 0,
+              maxPrice: 0,
+              sortBy: 'featured'
+            };
 
+            function getPrice(value) {
+              return Number(value ?? 0) || 0;
+            }
+
+            function formatProductCount(count) {
+              return `${count} product${count === 1 ? '' : 's'}`;
+            }
+
+            function createCategoryLink(label, count, isActive) {
+              const activeClass = isActive ? 'is-active' : '';
+              return `<a href="#catalog" data-category="${label}" class="${activeClass}"><span>${label}</span><strong>${count}</strong></a>`;
+            }
+
+            function createQuickFilterLink(label, filterKey, count, isActive) {
+              const activeClass = isActive ? 'is-active' : '';
+              return `<a href="#catalog" data-filter="${filterKey}" class="${activeClass}"><span>${label}</span><strong>${count}</strong></a>`;
+            }
+
+            function buildFilters(products) {
+              const categories = products.reduce((acc, product) => {
+                const category = (product.category || 'General').trim();
+                acc[category] = (acc[category] || 0) + 1;
+                return acc;
+              }, {});
+
+              const categoryContainer = document.getElementById('category-filters');
+              const allCount = products.length;
+              const categoryHtml = [createCategoryLink('All products', allCount, state.category === 'All products')];
+
+              Object.keys(categories).sort().forEach(category => {
+                categoryHtml.push(createCategoryLink(category, categories[category], state.category === category));
+              });
+
+              categoryContainer.innerHTML = categoryHtml.join('');
+
+              const quickContainer = document.getElementById('quick-filters');
+              const filterCounts = {
+                all: allCount,
+                new: products.filter(p => p.badge === 'New').length,
+                popular: products.filter(p => p.badge === 'Popular').length,
+                sale: products.filter(p => p.badge === 'Sale').length
+              };
+
+              quickContainer.innerHTML = [
+                createQuickFilterLink('All products', 'all', filterCounts.all, state.quickFilter === 'all'),
+                createQuickFilterLink('New arrivals', 'new', filterCounts.new, state.quickFilter === 'new'),
+                createQuickFilterLink('Most popular', 'popular', filterCounts.popular, state.quickFilter === 'popular'),
+                createQuickFilterLink('On sale', 'sale', filterCounts.sale, state.quickFilter === 'sale')
+              ].join('');
+
+              attachFilterHandlers();
+            }
+
+            function applyFilters(products) {
+              const min = state.minPrice;
+              const max = state.maxPrice;
+
+              return products.filter(product => {
+                const price = getPrice(product.price ?? product.unit_price);
+                const categoryMatch = state.category === 'All products' || (product.category || 'General') === state.category;
+                const priceMatch = price >= min && price <= max;
+                const quickMatch = state.quickFilter === 'all' ||
+                  (state.quickFilter === 'new' && product.badge === 'New') ||
+                  (state.quickFilter === 'popular' && product.badge === 'Popular') ||
+                  (state.quickFilter === 'sale' && product.badge === 'Sale');
+
+                return categoryMatch && priceMatch && quickMatch;
+              });
+            }
+
+            function sortProducts(products) {
+              return [...products].sort((a, b) => {
+                const priceA = getPrice(a.price ?? a.unit_price);
+                const priceB = getPrice(b.price ?? b.unit_price);
+
+                if (state.sortBy === 'price-asc') {
+                  return priceA - priceB;
+                }
+                if (state.sortBy === 'price-desc') {
+                  return priceB - priceA;
+                }
+                if (state.sortBy === 'popular') {
+                  const scoreA = a.badge === 'Popular' ? 1 : 0;
+                  const scoreB = b.badge === 'Popular' ? 1 : 0;
+                  return scoreB - scoreA;
+                }
+
+                return 0;
+              });
+            }
+
+            function renderProducts(products) {
               const grid = document.getElementById('products-grid');
-              if (!products || !products.length) {
-                grid.innerHTML = '<p class="empty-state">No products available.</p>';
+              const countEl = document.getElementById('product-count');
+              const visibleProducts = sortProducts(products);
+
+              countEl.textContent = formatProductCount(visibleProducts.length);
+
+              if (!visibleProducts.length) {
+                grid.innerHTML = '<p class="empty-state">No products match your filters.</p>';
                 return;
               }
 
-              grid.innerHTML = products.map(p => {
+              grid.innerHTML = visibleProducts.map(p => {
                 const price = p.price ?? p.unit_price ?? 0;
                 const rating = p.rating ?? 0;
                 const reviewCount = p.review_count ?? p.reviews ?? 0;
+                const productBadgeClass = p.badge === 'New' ? 'product-card-new' : p.badge === 'Popular' ? 'product-card-popular' : '';
+                const badgeClass = p.badge === 'New' ? 'is-new' : p.badge === 'Sale' ? 'is-sale' : '';
 
                 return `
-                <article class="product-card ${p.badge === 'Popular' ? 'product-card-popular' : p.badge === 'New' ? 'product-card-new' : ''}">
-                  <div class="product-card-top ${p.color_class}">
-                    <span class="product-badge ${p.badge === 'New' ? 'is-new' : p.badge === 'Sale' ? 'is-sale' : ''}">${p.badge || ''}</span>
+                <article class="product-card ${productBadgeClass}">
+                  <div class="product-card-top ${p.color_class || ''}">
+                    <span class="product-badge ${badgeClass}">${p.badge || ''}</span>
                     <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
                     <div class="product-icon" aria-hidden="true">${iconMap[p.name] || p.icon || '📦'}</div>
                   </div>
@@ -174,6 +270,70 @@
                 </article>
               `;
               }).join('');
+            }
+
+            function updatePriceInputs(products) {
+              const prices = products.map(p => getPrice(p.price ?? p.unit_price)).filter(n => n >= 0);
+              const min = prices.length ? Math.min(...prices) : 0;
+              const max = prices.length ? Math.max(...prices) : 0;
+              const minInput = document.getElementById('price-min');
+              const maxInput = document.getElementById('price-max');
+
+              state.minPrice = min;
+              state.maxPrice = max;
+              minInput.value = min;
+              maxInput.value = max;
+            }
+
+            function attachFilterHandlers() {
+              document.querySelectorAll('#category-filters a').forEach(link => {
+                link.addEventListener('click', event => {
+                  event.preventDefault();
+                  state.category = event.currentTarget.dataset.category;
+                  buildFilters(state.products);
+                  renderProducts(applyFilters(state.products));
+                });
+              });
+
+              document.querySelectorAll('#quick-filters a').forEach(link => {
+                link.addEventListener('click', event => {
+                  event.preventDefault();
+                  state.quickFilter = event.currentTarget.dataset.filter;
+                  buildFilters(state.products);
+                  renderProducts(applyFilters(state.products));
+                });
+              });
+
+              document.getElementById('price-min').addEventListener('change', event => {
+                state.minPrice = getPrice(event.target.value);
+                renderProducts(applyFilters(state.products));
+              });
+
+              document.getElementById('price-max').addEventListener('change', event => {
+                state.maxPrice = getPrice(event.target.value);
+                renderProducts(applyFilters(state.products));
+              });
+
+              document.getElementById('sort-select').addEventListener('change', event => {
+                state.sortBy = event.target.value;
+                renderProducts(applyFilters(state.products));
+              });
+            }
+
+            async function loadProducts() {
+              const products = await window.supabase.getProducts();
+              state.products = Array.isArray(products) ? products : [];
+
+              const grid = document.getElementById('products-grid');
+              if (!state.products.length) {
+                grid.innerHTML = '<p class="empty-state">No products available.</p>';
+                document.getElementById('product-count').textContent = formatProductCount(0);
+                return;
+              }
+
+              updatePriceInputs(state.products);
+              buildFilters(state.products);
+              renderProducts(applyFilters(state.products));
             }
 
             loadProducts();
