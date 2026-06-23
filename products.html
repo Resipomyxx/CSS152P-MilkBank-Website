@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-client.js"></script>
 </head>
 <body>
   <div class="page-shell">
@@ -116,196 +119,66 @@
             </label>
           </div>
 
-          <div class="products-grid" aria-label="Product catalog">
-            <article class="product-card product-card-popular">
-              <div class="product-card-top is-peach">
-                <span class="product-badge">Popular</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">🍼</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">BREAST PUMP</p>
-                <h3>Double electric breast pump</h3>
-                <p class="product-desc">Hospital-grade suction with 2-phase expression technology. Quiet motor, travel-ready design.</p>
-                <div class="product-meta">
-                  <strong>₱4,800</strong>
-                  <div class="product-rating" aria-label="Rated 4.8 out of 5">★★★★★ <span>4.8 (124)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-new">
-              <div class="product-card-top is-cream">
-                <span class="product-badge is-new">New</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">👩‍🍼</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">BREAST PUMP</p>
-                <h3>Single manual breast pump</h3>
-                <p class="product-desc">Ergonomic single-hand operation. Gentle on sensitive tissue, ideal for quick sessions.</p>
-                <div class="product-meta">
-                  <strong>₱890</strong>
-                  <div class="product-rating" aria-label="Rated 4.5 out of 5">★★★★★ <span>4.5 (67)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-popular">
-              <div class="product-card-top is-cream">
-                <span class="product-badge">Popular</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">👩‍🍼</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">BREAST PUMP</p>
-                <h3>Wearable hands-free pump</h3>
-                <p class="product-desc">Discreet in-bra pump that lets you multitask. App-controlled, whisper-quiet.</p>
-                <div class="product-meta">
-                  <strong>₱6,200</strong>
-                  <div class="product-rating" aria-label="Rated 4.7 out of 5">★★★★★ <span>4.7 (89)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card">
-              <div class="product-card-top is-blue">
-                <span class="product-badge is-sale">Sale</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">🧰</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">BREAST PUMP</p>
-                <h3>Hospital-grade rental pump kit</h3>
-                <p class="product-desc">Monthly rental kit with sterile personal-use parts. Recommended for prematurity support.</p>
-                <div class="product-meta">
-                  <strong>₱1,500</strong>
-                  <div class="product-rating" aria-label="Rated 4.9 out of 5">★★★★★ <span>4.9 (43)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-popular">
-              <div class="product-card-top is-sky">
-                <span class="product-badge">Popular</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">🛍️</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">MILK STORAGE</p>
-                <h3>Breast milk storage bags (50 pcs)</h3>
-                <p class="product-desc">Pre-sterilized, double-zipper BPA-free bags. Lay-flat design fits at a glance.</p>
-                <div class="product-meta">
-                  <strong>₱520</strong>
-                  <div class="product-rating" aria-label="Rated 4.8 out of 5">★★★★★ <span>4.8 (206)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-new">
-              <div class="product-card-top is-sky">
-                <span class="product-badge is-new">New</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">🍼</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">MILK STORAGE</p>
-                <h3>Glass milk storage bottles (set of 6)</h3>
-                <p class="product-desc">Borosilicate glass bottles with calibrated markings. Zero odor transfer, easy to wash.</p>
-                <div class="product-meta">
-                  <strong>₱1,100</strong>
-                  <div class="product-rating" aria-label="Rated 4.6 out of 5">★★★★★ <span>4.6 (55)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-sale">
-              <div class="product-card-top is-blue">
-                <span class="product-badge is-sale">Sale</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">🧊</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">MILK STORAGE</p>
-                <h3>Insulated milk cooler bag</h3>
-                <p class="product-desc">Keeps expressed milk at a safe temperature for up to 24 hours. Includes ice pack sleeve.</p>
-                <div class="product-meta">
-                  <strong>₱780</strong>
-                  <div class="product-rating" aria-label="Rated 4.5 out of 5">★★★★★ <span>4.5 (88)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card product-card-popular">
-              <div class="product-card-top is-lilac">
-                <span class="product-badge">Popular</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">👚</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">NURSING WEAR</p>
-                <h3>Nursing bra (2-pack)</h3>
-                <p class="product-desc">Seamless, wire-free fit with easy one-hand clip access and breathable fabric.</p>
-                <div class="product-meta">
-                  <strong>₱990</strong>
-                  <div class="product-rating" aria-label="Rated 4.7 out of 5">★★★★★ <span>4.7 (64)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
-
-            <article class="product-card">
-              <div class="product-card-top is-lilac">
-                <span class="product-badge is-new">New</span>
-                <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
-                <div class="product-icon" aria-hidden="true">📘</div>
-              </div>
-              <div class="product-card-body">
-                <p class="product-kicker">NURSING WEAR</p>
-                <h3>Nursing cover and wrap</h3>
-                <p class="product-desc">360° full coverage wrap with a structured neckline so mom can see baby clearly.</p>
-                <div class="product-meta">
-                  <strong>₱650</strong>
-                  <div class="product-rating" aria-label="Rated 4.4 out of 5">★★★★★ <span>4.4 (72)</span></div>
-                </div>
-                <div class="product-actions">
-                  <a class="button button-accent product-add" href="#">Add to cart</a>
-                  <a class="product-link" href="#">View details</a>
-                </div>
-              </div>
-            </article>
+          <div class="products-grid" id="products-grid" aria-label="Product catalog">
+            <!-- Products will load here dynamically -->
           </div>
+
+          <script>
+            // Icon mapping for existing products
+            const iconMap = {
+              'Double electric breast pump': '🍼',
+              'Single manual breast pump': '👩‍🍼',
+              'Wearable hands-free pump': '👩‍🍼',
+              'Hospital-grade rental pump kit': '🧰',
+              'Breast milk storage bags (50 pcs)': '🛍️',
+              'Glass milk storage bottles (set of 6)': '🍼',
+              'Insulated milk cooler bag': '🧊',
+              'Nursing bra (2-pack)': '👚',
+              'Nursing cover and wrap': '📘'
+            };
+
+            async function loadProducts() {
+              const products = await window.supabase.getProducts();
+
+              const grid = document.getElementById('products-grid');
+              if (!products || !products.length) {
+                grid.innerHTML = '<p class="empty-state">No products available.</p>';
+                return;
+              }
+
+              grid.innerHTML = products.map(p => {
+                const price = p.price ?? p.unit_price ?? 0;
+                const rating = p.rating ?? 0;
+                const reviewCount = p.review_count ?? p.reviews ?? 0;
+
+                return `
+                <article class="product-card ${p.badge === 'Popular' ? 'product-card-popular' : p.badge === 'New' ? 'product-card-new' : ''}">
+                  <div class="product-card-top ${p.color_class}">
+                    <span class="product-badge ${p.badge === 'New' ? 'is-new' : p.badge === 'Sale' ? 'is-sale' : ''}">${p.badge || ''}</span>
+                    <button class="product-wishlist" type="button" aria-label="Save product">♡</button>
+                    <div class="product-icon" aria-hidden="true">${iconMap[p.name] || p.icon || '📦'}</div>
+                  </div>
+                  <div class="product-card-body">
+                    <p class="product-kicker">${(p.category || 'General').toUpperCase()}</p>
+                    <h3>${p.name || 'Untitled product'}</h3>
+                    <p class="product-desc">${p.description || 'No description available.'}</p>
+                    <div class="product-meta">
+                      <strong>₱${Number(price).toLocaleString()}</strong>
+                      <div class="product-rating">★★★★★ <span>${rating} (${reviewCount})</span></div>
+                    </div>
+                    <div class="product-actions">
+                      <a class="button button-accent product-add" href="#">Add to cart</a>
+                      <a class="product-link" href="#">View details</a>
+                    </div>
+                  </div>
+                </article>
+              `;
+              }).join('');
+            }
+
+            loadProducts();
+          </script>
+        
         </section>
       </section>
     </main>
