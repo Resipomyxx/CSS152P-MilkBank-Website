@@ -216,20 +216,6 @@
                     </div>
                   </section>
 
-                  <section class="donor-step-card donor-step" data-step-title="Consent & Guidelines" data-step-note="Please review and accept the Donor EULA.">
-                    <div class="consent-form-split">
-                      <div style="padding: 0.25rem 0;">
-                        <p style="margin:0 0 0.6rem;">Please read the <a href="#" class="eula-link">EULA</a> before continuing.</p>
-                      </div>
-                      <div class="donor-confirm-grid">
-                        <label class="consent-accept donor-accept-row">
-                          <input type="checkbox" name="eula_acknowledged" required />
-                          <span>I have read and accept the <a href="#" class="eula-link">Donor EULA</a>.</span>
-                        </label>
-                      </div>
-                    </div>
-                  </section>
-
                   <section class="donor-step-card donor-step" data-step-title="Program Selection" data-step-note="Pick a program and collection arrangement before you continue.">
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
@@ -396,11 +382,9 @@
       });
 
       acceptBtn.addEventListener('click', () => {
-        // mark the form's terms and eula checkboxes
+        // mark the form's terms checkbox
         const terms = form.querySelector('input[name="terms_acknowledged"]');
-        const eulaBox = form.querySelector('input[name="eula_acknowledged"]');
         if (terms) terms.checked = true;
-        if (eulaBox) eulaBox.checked = true;
         hideEula();
         // re-trigger the Next/Submit button so the flow continues
         const nextBtn = document.querySelector('[data-step-action="next"]');

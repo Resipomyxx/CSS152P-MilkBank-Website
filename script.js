@@ -165,13 +165,12 @@ if (donorWizard) {
       // Final step: ensure EULA and terms were accepted
       const formEl = document.querySelector('[data-donor-wizard]');
       const termsBox = formEl ? formEl.querySelector('input[name="terms_acknowledged"]') : null;
-      const eulaBox = formEl ? formEl.querySelector('input[name="eula_acknowledged"]') : null;
-      if ((!termsBox || !termsBox.checked) || (!eulaBox || !eulaBox.checked)) {
+      if (!termsBox || !termsBox.checked) {
         if (typeof window.showDonorEula === 'function') {
           window.showDonorEula();
           return;
         }
-        alert('Please accept the EULA and registration terms before completing registration.');
+        alert('Please accept the registration terms before completing registration.');
         return;
       }
 
