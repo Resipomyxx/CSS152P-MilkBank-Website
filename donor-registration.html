@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Donor Registration</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="LactoCare home">
+        <span class="brand-mark">LC</span>
+        <span>
+          <strong>LactoCare</strong>
+          <small>Donor Portal</small>
+        </span>
+      </a>
+      <div class="nav-actions">
+        <a class="button button-secondary nav-login" href="login.html" data-auth="guest">Login</a>
+        <a class="button button-accent" href="donor-registration.html" data-auth="guest">Register</a>
+      </div>
+    </header>
+
+    <main>
+      <section style="padding: 4rem; text-align: center;">
+        <h2>Donor Registration</h2>
+        <p>Redirecting to the donor registration flow...</p>
+        <p>If you are not redirected automatically, <a href="donor.html">click here to continue to registration</a>.</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Small redirect so Register buttons can point here while the canonical form lives in donor.html
+    setTimeout(() => { window.location.href = 'donor.html'; }, 350);
+  </script>
+</body>
+</html>

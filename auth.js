@@ -225,7 +225,7 @@ async function updateAuthUI() {
 function updateNavVisibility(userType) {
   // Get all nav links
   const allNavLinks = document.querySelectorAll('.site-nav a');
-  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="history.html"]');
+  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="donor-registration.html"], a[href="history.html"]');
   const staffLinks = document.querySelectorAll('a[href="staff.html"], a[href="inventory.html"]');
   const publicLinks = document.querySelectorAll('a[href="index.html"], a[href="about.html"], a[href="products.html"]');
   const guestLinks = document.querySelectorAll('a[href="login.html"], a[href="register.html"]');

@@ -70,10 +70,17 @@ function setupDonorWizard() {
       }
     });
   });
+
+  // Ensure first active step is visible on load
+  const active = wizard.querySelector('.donor-step.is-active');
+  if (active) {
+    active.scrollIntoView({behavior: 'auto', block: 'start'});
+    updateStepLabel();
+  }
 }
 
 /**
- * Navigate to next step
+ * Navigate to next step using smooth vertical scroll
  */
 function nextStep() {
   const wizard = document.querySelector('[data-donor-wizard]');
@@ -83,14 +90,16 @@ function nextStep() {
   
   if (currentIndex < steps.length - 1) {
     activeStep.classList.remove('is-active');
-    steps[currentIndex + 1].classList.add('is-active');
+    const next = steps[currentIndex + 1];
+    next.classList.add('is-active');
     updateStepLabel();
-    updateStepPosition();
+    // Smooth scroll the next step into view (vertical reveal)
+    next.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
 }
 
 /**
- * Navigate to previous step
+ * Navigate to previous step using smooth vertical scroll
  */
 function previousStep() {
   const wizard = document.querySelector('[data-donor-wizard]');
@@ -100,25 +109,19 @@ function previousStep() {
   
   if (currentIndex > 0) {
     activeStep.classList.remove('is-active');
-    steps[currentIndex - 1].classList.add('is-active');
+    const prev = steps[currentIndex - 1];
+    prev.classList.add('is-active');
     updateStepLabel();
-    updateStepPosition();
+    prev.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
 }
 
 /**
  * Update the track position for the current step
+ * (No horizontal track used anymore for scroll reveal)
  */
 function updateStepPosition() {
-  const wizard = document.querySelector('[data-donor-wizard]');
-  const track = wizard.querySelector('.donor-wizard-track');
-  const activeStep = wizard.querySelector('.donor-step.is-active');
-  const steps = Array.from(wizard.querySelectorAll('.donor-step'));
-  const currentIndex = steps.indexOf(activeStep);
-  
-  if (track) {
-    track.style.transform = `translateX(-${currentIndex * 100}%)`;
-  }
+  // Intentionally left blank for scroll-based reveal
 }
 
 /**

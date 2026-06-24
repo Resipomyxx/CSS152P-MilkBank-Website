@@ -33,7 +33,7 @@
       <div class="nav-actions">
         <a class="button button-secondary" href="#" onclick="handleLogout()" data-auth="protected" style="display: none;">Logout</a>
         <a class="button button-secondary nav-login" href="login.html" data-auth="guest">Login</a>
-        <a class="button button-accent" href="donor.html" data-auth="guest">Register</a>
+        <a class="button button-accent" href="donor-registration.html" data-auth="guest">Register</a>
       </div>
       <nav class="site-nav" id="primary-navigation">
         <a href="index.html">Home</a>
@@ -64,74 +64,8 @@
 
               <div class="donor-wizard-viewport">
                 <div class="donor-wizard-track">
-                  <section class="donor-step-card donor-step is-active" data-step-title="Consent & Guidelines" data-step-note="Required legal acknowledgments for milk donation.">
-                    <div class="consent-form-split">
-                      <div class="eula-container">
-                        <div class="eula-content">
-                          <div class="eula-header" style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 2rem;">
-                            <h3 style="margin: 0; color: var(--primary);">DONOR END-USER LICENSE AGREEMENT (EULA)</h3>
-                            <p style="font-size: 0.8rem; color: var(--muted);">Last Updated: June 24, 2026</p>
-                          </div>
 
-                          <div class="eula-item">
-                            <h4>1. ACCEPTANCE OF TERMS</h4>
-                            <p>By engaging with the Bangkal Milk Bank (the "Service"), you agree to the terms and conditions outlined in this Donor End-User License Agreement ("EULA"). If you do not agree, you are prohibited from proceeding with the donation process.</p>
-                          </div>
-                          
-                          <div class="eula-item">
-                            <h4>2. DONATION GUIDELINES & SAFETY</h4>
-                            <p>All human milk donations are subject to strict screening protocols. The Donor acknowledges that donated milk will undergo Holder Pasteurization. The Service reserves the right to reject any donation that does not meet safety standards without prior notice.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>3. MANDATORY SEROLOGICAL SCREENING</h4>
-                            <p>Donors must undergo mandatory blood testing for HIV, Hepatitis B, Hepatitis C, and Syphilis. Failure to provide accurate results or undergo screening will result in immediate termination of the donation agreement. All costs are covered by the Service.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>4. DATA PRIVACY & USAGE (RA 10173)</h4>
-                            <p>Donor data is collected and processed in accordance with the Data Privacy Act of 2012. Records are strictly for medical tracking. The Service will not share your personal identification with third parties without express written consent.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>5. LIMITATION OF LIABILITY</h4>
-                            <p>The Service is not liable for any adverse reactions resulting from the donation process itself, provided that standard medical protocols were followed. Donors certify they are in good health and under no prohibited medication.</p>
-                          </div>
-
-                          <div class="eula-item" style="border-bottom: none;">
-                            <h4>6. DIGITAL ACKNOWLEDGEMENT</h4>
-                            <p>By checking the boxes below, you provide a digital signature that holds the same legal validity as a physical signature under the Electronic Commerce Act (RA 8792).</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="donor-confirm-grid">
-                        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 1.2rem;">
-                          <h4 style="margin: 0; color: var(--text); font-family: 'Playfair Display', serif; font-size: 1.3rem;">Confirmation</h4>
-                          <p style="margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--muted);">IRB Version 2.4 - June 2026</p>
-                        </div>
-
-                        <p style="margin: 0 0 1.2rem; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em;">Acknowledgment required</p>
-                        
-                        <div style="display: grid; gap: 1rem;">
-                          <label class="consent-accept donor-accept-row">
-                            <input type="checkbox" name="read_guidelines" required />
-                            <span>I have read the guidelines and agree to the screening.</span>
-                          </label>
-                          <label class="consent-accept donor-accept-row">
-                            <input type="checkbox" name="accept_data_privacy" required />
-                            <span>I consent to Data Privacy terms and medical usage.</span>
-                          </label>
-                        </div>
-
-                        <div style="margin-top: 2rem; padding: 1rem; background: var(--shade); border-radius: 12px; font-size: 0.8rem; color: var(--muted); line-height: 1.4;">
-                          <strong>Note:</strong> You must check all boxes to proceed to the personal information section.
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section class="donor-step-card donor-step" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
+                  <section class="donor-step-card donor-step is-active" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
                         <label for="full-name">Full name</label>
@@ -344,8 +278,72 @@
                       </div>
                     </div>
                   </section>
-                </div>
-              </div>
+                  <section class="donor-step-card donor-step" data-step-title="Consent & Guidelines" data-step-note="Required legal acknowledgments for milk donation.">
+                    <div class="consent-form-split">
+                      <div class="eula-container">
+                        <div class="eula-content">
+                          <div class="eula-header" style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 2rem;">
+                            <h3 style="margin: 0; color: var(--primary);">DONOR END-USER LICENSE AGREEMENT (EULA)</h3>
+                            <p style="font-size: 0.8rem; color: var(--muted);">Last Updated: June 24, 2026</p>
+                          </div>
+
+                          <div class="eula-item">
+                            <h4>1. ACCEPTANCE OF TERMS</h4>
+                            <p>By engaging with the Bangkal Milk Bank (the "Service"), you agree to the terms and conditions outlined in this Donor End-User License Agreement ("EULA"). If you do not agree, you are prohibited from proceeding with the donation process.</p>
+                          </div>
+                          
+                          <div class="eula-item">
+                            <h4>2. DONATION GUIDELINES & SAFETY</h4>
+                            <p>All human milk donations are subject to strict screening protocols. The Donor acknowledges that donated milk will undergo Holder Pasteurization. The Service reserves the right to reject any donation that does not meet safety standards without prior notice.</p>
+                          </div>
+
+                          <div class="eula-item">
+                            <h4>3. MANDATORY SEROLOGICAL SCREENING</h4>
+                            <p>Donors must undergo mandatory blood testing for HIV, Hepatitis B, Hepatitis C, and Syphilis. Failure to provide accurate results or undergo screening will result in immediate termination of the donation agreement. All costs are covered by the Service.</p>
+                          </div>
+
+                          <div class="eula-item">
+                            <h4>4. DATA PRIVACY & USAGE (RA 10173)</h4>
+                            <p>Donor data is collected and processed in accordance with the Data Privacy Act of 2012. Records are strictly for medical tracking. The Service will not share your personal identification with third parties without express written consent.</p>
+                          </div>
+
+                          <div class="eula-item">
+                            <h4>5. LIMITATION OF LIABILITY</h4>
+                            <p>The Service is not liable for any adverse reactions resulting from the donation process itself, provided that standard medical protocols were followed. Donors certify they are in good health and under no prohibited medication.</p>
+                          </div>
+
+                          <div class="eula-item" style="border-bottom: none;">
+                            <h4>6. DIGITAL ACKNOWLEDGEMENT</h4>
+                            <p>By checking the boxes below, you provide a digital signature that holds the same legal validity as a physical signature under the Electronic Commerce Act (RA 8792).</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="donor-confirm-grid">
+                        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 1.2rem;">
+                          <h4 style="margin: 0; color: var(--text); font-family: 'Playfair Display', serif; font-size: 1.3rem;">Confirmation</h4>
+                          <p style="margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--muted);">IRB Version 2.4 - June 2026</p>
+                        </div>
+
+                        <p style="margin: 0 0 1.2rem; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em;">Acknowledgment required</p>
+                        
+                        <div style="display: grid; gap: 1rem;">
+                          <label class="consent-accept donor-accept-row">
+                            <input type="checkbox" name="read_guidelines" required />
+                            <span>I have read the guidelines and agree to the screening.</span>
+                          </label>
+                          <label class="consent-accept donor-accept-row">
+                            <input type="checkbox" name="accept_data_privacy" required />
+                            <span>I consent to Data Privacy terms and medical usage.</span>
+                          </label>
+                        </div>
+
+                        <div style="margin-top: 2rem; padding: 1rem; background: var(--shade); border-radius: 12px; font-size: 0.8rem; color: var(--muted); line-height: 1.4;">
+                          <strong>Note:</strong> You must check all boxes to proceed to the personal information section.
+                        </div>
+                      </div>
+                    </div>
+                  </section>
 
               <div class="donor-actions action-row-spaced donor-wizard-actions">
                 <button class="button button-secondary" type="button" data-step-action="back">Back</button>
