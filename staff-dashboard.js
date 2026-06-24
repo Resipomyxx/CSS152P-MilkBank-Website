@@ -31,7 +31,21 @@ async function initStaffDashboard() {
   // Update greeting
   const greeting = document.querySelector('.orange-highlight');
   if (greeting) {
-    greeting.textContent = profile.full_name || 'Staff Member';
+    greeting.textContent = profile.full_name || (profile.user_type === 'admin' ? 'Administrator' : 'Staff Member');
+  }
+
+  // Handle Role-based restrictions
+  if (profile.user_type === 'admin') {
+    const smallTitle = document.querySelector('.site-header small');
+    if (smallTitle) smallTitle.textContent = 'Admin Dashboard';
+    
+    // Also update the sidebar label or breadcrumb if it exists
+    const eyebrow = document.querySelector('.dashboard-main .eyebrow');
+    if (eyebrow) eyebrow.textContent = 'Admin Overview';
+  } else {
+    // Staff member - hide admin-only features
+    const adminSections = document.querySelectorAll('[data-role="admin"]');
+    adminSections.forEach(el => el.style.display = 'none');
   }
 
   // Load dashboard data
@@ -220,23 +234,3 @@ function requireAuth(redirectUrl = 'login.html') {
   return user;
 }
 
-/**
- * Update navigation visibility based on user type
- */
-function updateNavVisibility(userType) {
-  // Get all nav links
-  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="history.html"]');
-  const staffLinks = document.querySelectorAll('a[href="staff.html"]');
-
-  if (userType === 'donor') {
-    // Hide staff links for donors
-    staffLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  } else if (userType === 'staff' || userType === 'admin') {
-    // Hide donor links for staff/admin
-    donorLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  }
-}

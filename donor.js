@@ -34,7 +34,7 @@ async function initDonorForm() {
 
   // Update navigation visibility
   if (profile) {
-    updateNavVisibility(profile.user_type);
+    // updateNavVisibility(profile.user_type); // Now handled by auth.js
   }
   
   // Pre-fill email for logged-in users
@@ -85,6 +85,7 @@ function nextStep() {
     activeStep.classList.remove('is-active');
     steps[currentIndex + 1].classList.add('is-active');
     updateStepLabel();
+    updateStepPosition();
   }
 }
 
@@ -101,6 +102,22 @@ function previousStep() {
     activeStep.classList.remove('is-active');
     steps[currentIndex - 1].classList.add('is-active');
     updateStepLabel();
+    updateStepPosition();
+  }
+}
+
+/**
+ * Update the track position for the current step
+ */
+function updateStepPosition() {
+  const wizard = document.querySelector('[data-donor-wizard]');
+  const track = wizard.querySelector('.donor-wizard-track');
+  const activeStep = wizard.querySelector('.donor-step.is-active');
+  const steps = Array.from(wizard.querySelectorAll('.donor-step'));
+  const currentIndex = steps.indexOf(activeStep);
+  
+  if (track) {
+    track.style.transform = `translateX(-${currentIndex * 100}%)`;
   }
 }
 
@@ -115,9 +132,18 @@ function updateStepLabel() {
   
   const stepLabel = wizard.querySelector('[data-step-label]');
   const stepTitle = wizard.querySelector('[data-step-title]');
+  const nextBtn = wizard.querySelector('button[type="submit"]');
   
   if (stepLabel) stepLabel.textContent = currentIndex;
   if (stepTitle) stepTitle.textContent = activeStep.dataset.stepTitle || 'Step ' + currentIndex;
+  
+  if (nextBtn) {
+    if (currentIndex === steps.length) {
+      nextBtn.textContent = 'Complete Registration';
+    } else {
+      nextBtn.textContent = 'Next Step';
+    }
+  }
 }
 
 /**
@@ -186,23 +212,3 @@ async function handleDonorRegistration(event) {
   }
 }
 
-/**
- * Update navigation visibility based on user type
- */
-function updateNavVisibility(userType) {
-  // Get all nav links
-  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="history.html"]');
-  const staffLinks = document.querySelectorAll('a[href="staff.html"]');
-
-  if (userType === 'donor') {
-    // Hide staff links for donors
-    staffLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  } else if (userType === 'staff' || userType === 'admin') {
-    // Hide donor links for staff/admin
-    donorLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  }
-}
