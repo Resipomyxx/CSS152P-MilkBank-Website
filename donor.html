@@ -81,12 +81,13 @@
                       </div>
                       <div class="donor-field">
                         <label for="preferred-contact">Preferred contact method</label>
-                        <select id="preferred-contact" name="preferred_contact_method" required>
+                        <select id="preferred-contact" name="preferred_contact_method" required aria-describedby="preferred-contact-help">
                           <option value="">Select one</option>
                           <option>Email</option>
                           <option>Phone</option>
                           <option>SMS</option>
                         </select>
+                        <div id="preferred-contact-help" class="helper-text">Choose how LactoCare should contact you for screening and scheduling (Email, Phone, or SMS).</div>
                       </div>
                       <div class="donor-field donor-field-full">
                         <label class="consent-accept donor-accept-row">
