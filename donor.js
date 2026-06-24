@@ -16,12 +16,9 @@ async function initDonorForm() {
   const user = await window.supabase.getCurrentUser();
   
   if (!user) {
-    // Redirect to login if not authenticated
-    const loginBtn = document.querySelector('.nav-login');
-    if (confirm('You must be logged in to register as a donor. Go to login?')) {
-      window.location.href = 'login.html';
-    }
-    return;
+    // Allow guest access to the registration flow — account creation occurs in the Account Setup step.
+    console.log('Guest user: donor registration available without prior login.');
+    // do not redirect; return early only when strict auth is required elsewhere
   }
   
   // Get user profile to check if they're a donor
