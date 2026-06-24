@@ -64,7 +64,7 @@ if (programRows.length) {
   });
 }
 
-if (donorWizard) {
+if (donorWizard && typeof window.setupDonorWizard !== 'function') {
   const track = donorWizard.querySelector('.donor-wizard-track');
   const steps = Array.from(donorWizard.querySelectorAll('.donor-step'));
   const stepLabel = donorWizard.querySelector('[data-step-label]');
