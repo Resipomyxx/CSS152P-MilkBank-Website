@@ -85,6 +85,12 @@ function nextStep() {
   const steps = Array.from(wizard.querySelectorAll('.donor-step'));
   const currentIndex = steps.indexOf(activeStep);
   
+  // Validate current step before moving on (uses global validator exposed by script.js)
+  if (typeof window.validateStep === 'function') {
+    const valid = window.validateStep(activeStep);
+    if (!valid) return; // do not advance if validation fails
+  }
+
   if (currentIndex < steps.length - 1) {
     activeStep.classList.remove('is-active');
     const next = steps[currentIndex + 1];

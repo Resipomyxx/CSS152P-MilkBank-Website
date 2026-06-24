@@ -139,6 +139,9 @@ if (donorWizard) {
     return true;
   };
 
+  // Expose validateStep globally so other scripts (donor.js) can call it before advancing
+  window.validateStep = validateStep;
+
   if (backButton) {
     backButton.addEventListener('click', () => {
       if (currentStep > 0) {
