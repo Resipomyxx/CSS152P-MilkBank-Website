@@ -2006,6 +2006,18 @@ flex-direction: column;
   font-size: 0.78rem;
 }
 
+/* EULA inline link styling */
+.eula-link {
+  color: #1e66ff; /* blue highlight */
+  text-decoration: underline;
+  font-weight: 700;
+}
+.eula-link:hover,
+.eula-link:focus {
+  color: #154ed6;
+  text-decoration: underline;
+}
+
 .consent-actions {
   display: flex;
   justify-content: center;
