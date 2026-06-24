@@ -93,7 +93,7 @@
                           <input type="checkbox" name="terms_acknowledged" required />
                           <span>I agree to the registration terms and understand that my information will be reviewed before activation.</span>
                         </label>
-                        <p class="helper-text" style="margin-top:0.5rem;">Read the full <a href="#" class="eula-link">EULA</a>.</p>
+                        <p class="helper-text" style="margin-top:0.5rem;">Click here to read the full <a href="#" class="eula-link">EULA</a>.</p>
                       </div>
                     </div>
                   </section>
@@ -334,12 +334,6 @@
             <p>The Service follows standard medical protocols and limits liability as described in the EULA.</p>
           </div>
         </div>
-        <div class="modal-actions">
-          <div style="display:flex; gap:0.6rem; margin-top:0.8rem; justify-content:flex-end;">
-            <button id="eula-cancel" class="button button-secondary" type="button">Cancel</button>
-            <button id="eula-accept" class="button button-primary" type="button">Accept & Continue</button>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -351,14 +345,13 @@
     // EULA modal wiring (keeps in page so it's available without additional round trips)
     (function() {
       const modalOverlay = document.getElementById('eula-modal');
-      const acceptBtn = document.getElementById('eula-accept');
-      const cancelBtn = document.getElementById('eula-cancel');
       const form = document.querySelector('[data-donor-wizard]');
 
       function showEula() {
         modalOverlay.style.display = 'flex';
         modalOverlay.setAttribute('aria-hidden', 'false');
-        acceptBtn.focus();
+        // focus the modal for accessibility
+        modalOverlay.querySelector('.modal').focus();
       }
 
       function hideEula() {
@@ -366,18 +359,16 @@
         modalOverlay.setAttribute('aria-hidden', 'true');
       }
 
-      cancelBtn.addEventListener('click', () => {
-        hideEula();
+      // Close modal by clicking outside the modal content
+      modalOverlay.addEventListener('click', (ev) => {
+        if (ev.target === modalOverlay) hideEula();
       });
 
-      acceptBtn.addEventListener('click', () => {
-        // mark the form's terms checkbox
-        const terms = form.querySelector('input[name="terms_acknowledged"]');
-        if (terms) terms.checked = true;
-        hideEula();
-        // re-trigger the Next/Submit button so the flow continues
-        const nextBtn = document.querySelector('[data-step-action="next"]');
-        if (nextBtn) nextBtn.click();
+      // Close modal on Escape
+      document.addEventListener('keydown', (ev) => {
+        if (ev.key === 'Escape' && modalOverlay.getAttribute('aria-hidden') === 'false') {
+          hideEula();
+        }
       });
 
       // Wire any EULA links on the page to open the modal
@@ -394,4 +385,3 @@
   </script>
 </body>
 </html>
-
