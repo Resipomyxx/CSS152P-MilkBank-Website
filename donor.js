@@ -166,12 +166,18 @@ async function handleDonorRegistration(event) {
   }
 
   // Only proceed with registration on the FINAL step
-  // Verify authentication
+  // Verify authentication if required (guest flows allowed)
   const user = await window.supabase.getCurrentUser();
-  if (!user) {
-    alert('You must be logged in to complete donor registration.');
-    window.location.href = 'login.html';
-    return;
+  // If EULA not accepted yet, show modal and defer submission
+  const form = document.querySelector('[data-donor-wizard]');
+  const termsCheckbox = form.querySelector('input[name="terms_acknowledged"]');
+  const eulaAccepted = termsCheckbox && termsCheckbox.checked;
+  if (!eulaAccepted) {
+    // Show modal popup — window.showDonorEula is provided by donor.html inline script
+    if (typeof window.showDonorEula === 'function') {
+      window.showDonorEula();
+      return;
+    }
   }
 
   // Get blood type from form if available

@@ -278,72 +278,6 @@
                       </div>
                     </div>
                   </section>
-                  <section class="donor-step-card donor-step" data-step-title="Consent & Guidelines" data-step-note="Required legal acknowledgments for milk donation.">
-                    <div class="consent-form-split">
-                      <div class="eula-container">
-                        <div class="eula-content">
-                          <div class="eula-header" style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 2rem;">
-                            <h3 style="margin: 0; color: var(--primary);">DONOR END-USER LICENSE AGREEMENT (EULA)</h3>
-                            <p style="font-size: 0.8rem; color: var(--muted);">Last Updated: June 24, 2026</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>1. ACCEPTANCE OF TERMS</h4>
-                            <p>By engaging with the Bangkal Milk Bank (the "Service"), you agree to the terms and conditions outlined in this Donor End-User License Agreement ("EULA"). If you do not agree, you are prohibited from proceeding with the donation process.</p>
-                          </div>
-                          
-                          <div class="eula-item">
-                            <h4>2. DONATION GUIDELINES & SAFETY</h4>
-                            <p>All human milk donations are subject to strict screening protocols. The Donor acknowledges that donated milk will undergo Holder Pasteurization. The Service reserves the right to reject any donation that does not meet safety standards without prior notice.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>3. MANDATORY SEROLOGICAL SCREENING</h4>
-                            <p>Donors must undergo mandatory blood testing for HIV, Hepatitis B, Hepatitis C, and Syphilis. Failure to provide accurate results or undergo screening will result in immediate termination of the donation agreement. All costs are covered by the Service.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>4. DATA PRIVACY & USAGE (RA 10173)</h4>
-                            <p>Donor data is collected and processed in accordance with the Data Privacy Act of 2012. Records are strictly for medical tracking. The Service will not share your personal identification with third parties without express written consent.</p>
-                          </div>
-
-                          <div class="eula-item">
-                            <h4>5. LIMITATION OF LIABILITY</h4>
-                            <p>The Service is not liable for any adverse reactions resulting from the donation process itself, provided that standard medical protocols were followed. Donors certify they are in good health and under no prohibited medication.</p>
-                          </div>
-
-                          <div class="eula-item" style="border-bottom: none;">
-                            <h4>6. DIGITAL ACKNOWLEDGEMENT</h4>
-                            <p>By checking the boxes below, you provide a digital signature that holds the same legal validity as a physical signature under the Electronic Commerce Act (RA 8792).</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div class="donor-confirm-grid">
-                        <div style="margin-bottom: 1.5rem; border-bottom: 1px solid var(--line); padding-bottom: 1.2rem;">
-                          <h4 style="margin: 0; color: var(--text); font-family: 'Playfair Display', serif; font-size: 1.3rem;">Confirmation</h4>
-                          <p style="margin: 0.4rem 0 0; font-size: 0.85rem; color: var(--muted);">IRB Version 2.4 - June 2026</p>
-                        </div>
-
-                        <p style="margin: 0 0 1.2rem; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em;">Acknowledgment required</p>
-                        
-                        <div style="display: grid; gap: 1rem;">
-                          <label class="consent-accept donor-accept-row">
-                            <input type="checkbox" name="read_guidelines" required />
-                            <span>I have read the guidelines and agree to the screening.</span>
-                          </label>
-                          <label class="consent-accept donor-accept-row">
-                            <input type="checkbox" name="accept_data_privacy" required />
-                            <span>I consent to Data Privacy terms and medical usage.</span>
-                          </label>
-                        </div>
-
-                        <div style="margin-top: 2rem; padding: 1rem; background: var(--shade); border-radius: 12px; font-size: 0.8rem; color: var(--muted); line-height: 1.4;">
-                          <strong>Note:</strong> You must check all boxes to proceed to the personal information section.
-                        </div>
-                      </div>
-                    </div>
-                  </section>
 
               <div class="donor-actions action-row-spaced donor-wizard-actions">
                 <button class="button button-secondary" type="button" data-step-action="back">Back</button>
@@ -381,8 +315,86 @@
     </footer>
   </div>
 
+  <div id="eula-modal" class="modal-overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="eula-title">
+      <div class="modal-content">
+        <h3 id="eula-title">Donor End-User License Agreement (EULA)</h3>
+        <div class="modal-body">
+          <p style="font-weight:700;">Please read and accept the Donor EULA to complete registration.</p>
+          <div class="eula-scroll">
+            <h4>1. Acceptance of terms</h4>
+            <p>By engaging with the Bangkal Milk Bank (the "Service"), you agree to the terms and conditions outlined in this Donor End-User License Agreement ("EULA").</p>
+            <h4>2. Donation guidelines & safety</h4>
+            <p>Donated milk will undergo Holder Pasteurization and may be rejected if it does not meet safety standards.</p>
+            <h4>3. Mandatory serological screening</h4>
+            <p>Donors must undergo required blood testing for certain infections; costs are covered by the Service.</p>
+            <h4>4. Data privacy</h4>
+            <p>Donor data is processed per applicable law and used for medical tracking only.</p>
+            <h4>5. Limitation of liability</h4>
+            <p>The Service follows standard medical protocols and limits liability as described in the EULA.</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <label class="consent-accept" style="align-items:center;">
+            <input id="eula-agree" type="checkbox" />
+            <span style="margin-left:0.6rem; font-weight:700;">I agree to the Donor EULA</span>
+          </label>
+          <div style="display:flex; gap:0.6rem; margin-top:0.8rem;">
+            <button id="eula-cancel" class="button button-secondary" type="button">Cancel</button>
+            <button id="eula-accept" class="button button-primary" type="button" disabled>Accept & Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="script.js"></script>
   <script src="donor.js"></script>
+
+  <script>
+    // EULA modal wiring (keeps in page so it's available without additional round trips)
+    (function() {
+      const modalOverlay = document.getElementById('eula-modal');
+      const agreeCheckbox = document.getElementById('eula-agree');
+      const acceptBtn = document.getElementById('eula-accept');
+      const cancelBtn = document.getElementById('eula-cancel');
+      const form = document.querySelector('[data-donor-wizard]');
+
+      function showEula() {
+        modalOverlay.style.display = 'block';
+        modalOverlay.setAttribute('aria-hidden', 'false');
+        agreeCheckbox.checked = false;
+        acceptBtn.disabled = true;
+        agreeCheckbox.focus();
+      }
+
+      function hideEula() {
+        modalOverlay.style.display = 'none';
+        modalOverlay.setAttribute('aria-hidden', 'true');
+      }
+
+      // Enable accept when checkbox checked
+      agreeCheckbox.addEventListener('change', () => {
+        acceptBtn.disabled = !agreeCheckbox.checked;
+      });
+
+      cancelBtn.addEventListener('click', () => {
+        hideEula();
+      });
+
+      acceptBtn.addEventListener('click', () => {
+        // mark the form's terms_acknowledged checkbox
+        const terms = form.querySelector('input[name="terms_acknowledged"]');
+        if (terms) terms.checked = true;
+        hideEula();
+        // submit the form programmatically
+        form.requestSubmit();
+      });
+
+      // Expose showEula globally for donor.js to call before final submit
+      window.showDonorEula = showEula;
+    })();
+  </script>
 </body>
 </html>
 
