@@ -65,7 +65,39 @@
               <div class="donor-wizard-viewport">
                 <div class="donor-wizard-track">
 
-                  <section class="donor-step-card donor-step is-active" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
+                  <section class="donor-step-card donor-step is-active" data-step-title="Account Setup" data-step-note="Finish the account details and accept the terms to complete registration.">
+                    <div class="donor-form-grid donor-form-grid-block">
+                      <div class="donor-field">
+                        <label for="username">Username</label>
+                        <input id="username" name="username" type="text" placeholder="Choose a username" required />
+                      </div>
+                      <div class="donor-field">
+                        <label for="password">Password</label>
+                        <input id="password" name="password" type="password" placeholder="Create a password" required />
+                      </div>
+                      <div class="donor-field">
+                        <label for="confirm-password">Confirm password</label>
+                        <input id="confirm-password" name="confirm_password" type="password" placeholder="Re-enter password" required />
+                      </div>
+                      <div class="donor-field">
+                        <label for="preferred-contact">Preferred contact method</label>
+                        <select id="preferred-contact" name="preferred_contact_method" required>
+                          <option value="">Select one</option>
+                          <option>Email</option>
+                          <option>Phone</option>
+                          <option>SMS</option>
+                        </select>
+                      </div>
+                      <div class="donor-field donor-field-full">
+                        <label class="consent-accept donor-accept-row">
+                          <input type="checkbox" name="terms_acknowledged" required />
+                          <span>I agree to the <a href="#" class="eula-link">EULA</a> and understand that my information will be reviewed before activation.</span>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="donor-step-card donor-step" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
                         <label for="full-name">Full name</label>
@@ -184,6 +216,20 @@
                     </div>
                   </section>
 
+                  <section class="donor-step-card donor-step" data-step-title="Consent & Guidelines" data-step-note="Please review and accept the Donor EULA.">
+                    <div class="consent-form-split">
+                      <div style="padding: 0.25rem 0;">
+                        <p style="margin:0 0 0.6rem;">Please read the <a href="#" class="eula-link">EULA</a> before continuing.</p>
+                      </div>
+                      <div class="donor-confirm-grid">
+                        <label class="consent-accept donor-accept-row">
+                          <input type="checkbox" name="eula_acknowledged" required />
+                          <span>I have read and accept the <a href="#" class="eula-link">Donor EULA</a>.</span>
+                        </label>
+                      </div>
+                    </div>
+                  </section>
+
                   <section class="donor-step-card donor-step" data-step-title="Program Selection" data-step-note="Pick a program and collection arrangement before you continue.">
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
@@ -247,39 +293,6 @@
                     </div>
                   </section>
 
-                  <section class="donor-step-card donor-step" data-step-title="Account Setup" data-step-note="Finish the account details and accept the terms to complete registration.">
-                    <div class="donor-form-grid donor-form-grid-block">
-                      <div class="donor-field">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" type="text" placeholder="Choose a username" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Create a password" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="confirm-password">Confirm password</label>
-                        <input id="confirm-password" name="confirm_password" type="password" placeholder="Re-enter password" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="preferred-contact">Preferred contact method</label>
-                        <select id="preferred-contact" name="preferred_contact_method" required>
-                          <option value="">Select one</option>
-                          <option>Email</option>
-                          <option>Phone</option>
-                          <option>SMS</option>
-                        </select>
-                      </div>
-                      <div class="donor-field donor-field-full">
-                        <label class="consent-accept donor-accept-row">
-                          <input type="checkbox" name="terms_acknowledged" required />
-                          <span>I agree to the donor registration terms and understand that my information will be reviewed before activation.</span>
-                        </label>
-                      </div>
-                    </div>
-                  </section>
-
-              <div class="donor-actions action-row-spaced donor-wizard-actions">
                 <button class="button button-secondary" type="button" data-step-action="back">Back</button>
                 <div class="donor-actions-right">
                   <button class="button button-secondary" type="button" data-step-action="save">Save Draft</button>
@@ -361,7 +374,7 @@
       const form = document.querySelector('[data-donor-wizard]');
 
       function showEula() {
-        modalOverlay.style.display = 'block';
+        modalOverlay.style.display = 'flex';
         modalOverlay.setAttribute('aria-hidden', 'false');
         agreeCheckbox.checked = false;
         acceptBtn.disabled = true;
@@ -383,12 +396,23 @@
       });
 
       acceptBtn.addEventListener('click', () => {
-        // mark the form's terms_acknowledged checkbox
+        // mark the form's terms and eula checkboxes
         const terms = form.querySelector('input[name="terms_acknowledged"]');
+        const eulaBox = form.querySelector('input[name="eula_acknowledged"]');
         if (terms) terms.checked = true;
+        if (eulaBox) eulaBox.checked = true;
         hideEula();
-        // submit the form programmatically
-        form.requestSubmit();
+        // re-trigger the Next/Submit button so the flow continues
+        const nextBtn = document.querySelector('[data-step-action="next"]');
+        if (nextBtn) nextBtn.click();
+      });
+
+      // Wire any EULA links on the page to open the modal
+      document.querySelectorAll('.eula-link').forEach(link => {
+        link.addEventListener('click', (ev) => {
+          ev.preventDefault();
+          showEula();
+        });
       });
 
       // Expose showEula globally for donor.js to call before final submit
