@@ -335,13 +335,9 @@
           </div>
         </div>
         <div class="modal-actions">
-          <label class="consent-accept" style="align-items:center;">
-            <input id="eula-agree" type="checkbox" />
-            <span style="margin-left:0.6rem; font-weight:700;">I agree to the Donor EULA</span>
-          </label>
-          <div style="display:flex; gap:0.6rem; margin-top:0.8rem;">
+          <div style="display:flex; gap:0.6rem; margin-top:0.8rem; justify-content:flex-end;">
             <button id="eula-cancel" class="button button-secondary" type="button">Cancel</button>
-            <button id="eula-accept" class="button button-primary" type="button" disabled>Accept & Continue</button>
+            <button id="eula-accept" class="button button-primary" type="button">Accept & Continue</button>
           </div>
         </div>
       </div>
@@ -355,7 +351,6 @@
     // EULA modal wiring (keeps in page so it's available without additional round trips)
     (function() {
       const modalOverlay = document.getElementById('eula-modal');
-      const agreeCheckbox = document.getElementById('eula-agree');
       const acceptBtn = document.getElementById('eula-accept');
       const cancelBtn = document.getElementById('eula-cancel');
       const form = document.querySelector('[data-donor-wizard]');
@@ -363,20 +358,13 @@
       function showEula() {
         modalOverlay.style.display = 'flex';
         modalOverlay.setAttribute('aria-hidden', 'false');
-        agreeCheckbox.checked = false;
-        acceptBtn.disabled = true;
-        agreeCheckbox.focus();
+        acceptBtn.focus();
       }
 
       function hideEula() {
         modalOverlay.style.display = 'none';
         modalOverlay.setAttribute('aria-hidden', 'true');
       }
-
-      // Enable accept when checkbox checked
-      agreeCheckbox.addEventListener('change', () => {
-        acceptBtn.disabled = !agreeCheckbox.checked;
-      });
 
       cancelBtn.addEventListener('click', () => {
         hideEula();
