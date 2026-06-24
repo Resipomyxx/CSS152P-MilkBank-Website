@@ -192,23 +192,3 @@ async function requireAuth(redirectUrl = 'login.html') {
   return user;
 }
 
-/**
- * Update navigation visibility based on user type
- */
-function updateNavVisibility(userType) {
-  // Get all nav links
-  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="history.html"]');
-  const staffLinks = document.querySelectorAll('a[href="staff.html"]');
-
-  if (userType === 'donor') {
-    // Hide staff links for donors
-    staffLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  } else if (userType === 'staff' || userType === 'admin') {
-    // Hide donor links for staff/admin
-    donorLinks.forEach(link => {
-      link.style.display = 'none';
-    });
-  }
-}

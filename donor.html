@@ -31,8 +31,9 @@
         <span class="sr-only">Open navigation</span>
       </button>
       <div class="nav-actions">
-        <a class="button button-secondary nav-login" href="login.html">Login</a>
-        <a class="button button-accent" href="register.html">Register</a>
+        <a class="button button-secondary" href="#" onclick="handleLogout()" data-auth="protected" style="display: none;">Logout</a>
+        <a class="button button-secondary nav-login" href="login.html" data-auth="guest">Login</a>
+        <a class="button button-accent" href="donor.html" data-auth="guest">Register</a>
       </div>
       <nav class="site-nav" id="primary-navigation">
         <a href="index.html">Home</a>
@@ -67,29 +68,39 @@
                     <div class="consent-form-split">
                       <div class="eula-container">
                         <div class="eula-content">
+                          <div class="eula-header" style="text-align: center; border-bottom: 2px solid var(--primary); padding-bottom: 1rem; margin-bottom: 2rem;">
+                            <h3 style="margin: 0; color: var(--primary);">DONOR END-USER LICENSE AGREEMENT (EULA)</h3>
+                            <p style="font-size: 0.8rem; color: var(--muted);">Last Updated: June 24, 2026</p>
+                          </div>
+
                           <div class="eula-item">
-                            <h4>Donation Guidelines & Safety</h4>
-                            <p>All donated human milk is subject to heat treatment (Holder Pasteurization) to eliminate potential pathogens. By proceeding, you acknowledge that your milk will be pooled with milk from other screened donors to ensure nutrient consistency.</p>
+                            <h4>1. ACCEPTANCE OF TERMS</h4>
+                            <p>By engaging with the Bangkal Milk Bank (the "Service"), you agree to the terms and conditions outlined in this Donor End-User License Agreement ("EULA"). If you do not agree, you are prohibited from proceeding with the donation process.</p>
                           </div>
                           
                           <div class="eula-item">
-                            <h4>Serological Screening</h4>
-                            <p>Donors must undergo mandatory blood testing for HIV-1/2, Hepatitis B, Hepatitis C, and Syphilis. Cost of these tests is fully covered by the Bangkal Milk Bank. Results are strictly confidential.</p>
+                            <h4>2. DONATION GUIDELINES & SAFETY</h4>
+                            <p>All human milk donations are subject to strict screening protocols. The Donor acknowledges that donated milk will undergo Holder Pasteurization. The Service reserves the right to reject any donation that does not meet safety standards without prior notice.</p>
                           </div>
 
                           <div class="eula-item">
-                            <h4>Data Privacy Statement</h4>
-                            <p>Your records (medical history, test results, donation volumes) are encrypted and stored in compliance with the Data Privacy Act (RA 10173). Access is limited to authorized medical staff for safety tracking only.</p>
+                            <h4>3. MANDATORY SEROLOGICAL SCREENING</h4>
+                            <p>Donors must undergo mandatory blood testing for HIV, Hepatitis B, Hepatitis C, and Syphilis. Failure to provide accurate results or undergo screening will result in immediate termination of the donation agreement. All costs are covered by the Service.</p>
                           </div>
 
                           <div class="eula-item">
-                            <h4>Usage of Donated Milk</h4>
-                            <p>Priority is given to hospitalized premature infants in neonatal intensive care units (NICU). Any surplus may be used for medical research under IRB-approved protocols unless you explicitly opt-out.</p>
+                            <h4>4. DATA PRIVACY & USAGE (RA 10173)</h4>
+                            <p>Donor data is collected and processed in accordance with the Data Privacy Act of 2012. Records are strictly for medical tracking. The Service will not share your personal identification with third parties without express written consent.</p>
                           </div>
 
                           <div class="eula-item">
-                            <h4>Digital Acknowledgement</h4>
-                            <p>This electronic signature carries the same legal weight as a handwritten signature. You certify that you are in good health and not taking any prohibited medications.</p>
+                            <h4>5. LIMITATION OF LIABILITY</h4>
+                            <p>The Service is not liable for any adverse reactions resulting from the donation process itself, provided that standard medical protocols were followed. Donors certify they are in good health and under no prohibited medication.</p>
+                          </div>
+
+                          <div class="eula-item" style="border-bottom: none;">
+                            <h4>6. DIGITAL ACKNOWLEDGEMENT</h4>
+                            <p>By checking the boxes below, you provide a digital signature that holds the same legal validity as a physical signature under the Electronic Commerce Act (RA 8792).</p>
                           </div>
                         </div>
                       </div>

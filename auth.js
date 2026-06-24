@@ -187,7 +187,9 @@ async function requireAuth(redirectUrl = 'login.html') {
  */
 async function updateAuthUI() {
   const user = await window.supabase.getCurrentUser();
-  
+  const profile = user ? await window.supabase.getUserProfile() : null;
+  const userType = profile ? profile.user_type : 'guest';
+
   // Hide login/register links and show profile/logout if authenticated
   const authLinks = document.querySelectorAll('[data-auth="guest"]');
   const protectedLinks = document.querySelectorAll('[data-auth="protected"]');
@@ -197,13 +199,52 @@ async function updateAuthUI() {
     protectedLinks.forEach(el => el.style.display = 'block');
     
     // Update role-based navigation visibility
-    const profile = await window.supabase.getUserProfile();
-    if (profile && typeof updateNavVisibility === 'function') {
-      updateNavVisibility(profile.user_type);
+    updateNavVisibility(userType);
+    
+    // Special handling for staff dashboard title if admin
+    if (userType === 'admin') {
+      const staffDashLink = document.querySelector('a[href="staff.html"]');
+      if (staffDashLink) staffDashLink.textContent = 'Admin Dashboard';
+      
+      const dashTitle = document.querySelector('.site-header small');
+      if (dashTitle && window.location.pathname.includes('staff.html')) {
+        dashTitle.textContent = 'Admin Dashboard';
+      }
     }
   } else {
     authLinks.forEach(el => el.style.display = 'block');
     protectedLinks.forEach(el => el.style.display = 'none');
+    updateNavVisibility('guest');
+  }
+}
+
+/**
+ * Update navigation visibility based on user type
+ * Roles: guest, donor, staff, admin
+ */
+function updateNavVisibility(userType) {
+  // Get all nav links
+  const allNavLinks = document.querySelectorAll('.site-nav a');
+  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="history.html"]');
+  const staffLinks = document.querySelectorAll('a[href="staff.html"], a[href="inventory.html"]');
+  const publicLinks = document.querySelectorAll('a[href="index.html"], a[href="about.html"], a[href="products.html"]');
+  const guestLinks = document.querySelectorAll('a[href="login.html"], a[href="register.html"]');
+
+  // Reset display
+  allNavLinks.forEach(link => link.style.display = 'inline-block');
+
+  if (userType === 'donor') {
+    staffLinks.forEach(link => link.style.display = 'none');
+    guestLinks.forEach(link => link.style.display = 'none');
+  } else if (userType === 'staff' || userType === 'admin') {
+    donorLinks.forEach(link => link.style.display = 'none');
+    guestLinks.forEach(link => link.style.display = 'none');
+    // Staff/Admin can see public links too
+  } else {
+    // Guest
+    document.querySelectorAll('a[href="history.html"]').forEach(link => link.style.display = 'none');
+    staffLinks.forEach(link => link.style.display = 'none');
+    // Guests can see public links and login/register
   }
 }
 
