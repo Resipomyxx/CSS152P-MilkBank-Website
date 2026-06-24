@@ -5,8 +5,11 @@
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
-  await initDonorForm();
-  setupDonorWizard();
+  try {
+    await initDonorForm();
+  } finally {
+    setupDonorWizard();
+  }
 });
 
 /**
@@ -34,9 +37,9 @@ async function initDonorForm() {
     // updateNavVisibility(profile.user_type); // Now handled by auth.js
   }
   
-  // Pre-fill email for logged-in users
+  // Pre-fill email for logged-in users only
   const emailField = document.getElementById('email');
-  if (emailField) {
+  if (emailField && user?.email) {
     emailField.value = user.email;
     emailField.disabled = true;
   }
