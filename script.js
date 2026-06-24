@@ -5,122 +5,6 @@ const reveals = document.querySelectorAll('.reveal');
 const programRows = document.querySelectorAll('.program-row[data-program-volume]');
 const donorWizard = document.querySelector('[data-donor-wizard]');
 
-// Ensure validateStep is always available globally so other scripts (donor.js) can call it.
-if (typeof window.validateStep !== 'function') {
-  window.validateStep = (step) => {
-    // Local copies of helpers to show/clear validation feedback
-    let activeValidationControl = null;
-    let activeValidationTooltip = null;
-    let activeValidationHandler = null;
-
-    const clearValidationFeedback = () => {
-      if (activeValidationControl && activeValidationHandler) {
-        activeValidationControl.removeEventListener('input', activeValidationHandler);
-        activeValidationControl.removeEventListener('change', activeValidationHandler);
-        activeValidationControl.classList.remove('input-error-shake');
-        activeValidationControl.removeAttribute('aria-describedby');
-      }
-
-      if (activeValidationTooltip) {
-        activeValidationTooltip.remove();
-      }
-
-      activeValidationControl = null;
-      activeValidationTooltip = null;
-      activeValidationHandler = null;
-      document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
-    };
-
-    const showValidationFeedback = (control, message, isResolved = () => control.checkValidity()) => {
-      clearValidationFeedback();
-
-      control.classList.add('input-error-shake');
-      control.setAttribute('aria-describedby', 'field-tooltip');
-
-      const tip = document.createElement('div');
-      tip.id = 'field-tooltip';
-      tip.className = 'field-tooltip';
-      tip.setAttribute('role', 'status');
-      tip.setAttribute('aria-live', 'polite');
-      tip.textContent = message;
-      document.body.appendChild(tip);
-
-      const rect = control.getBoundingClientRect();
-      const tipRect = tip.getBoundingClientRect();
-      const gap = 14;
-      const viewportPadding = 10;
-      const spaceRight = window.innerWidth - rect.right;
-      const spaceLeft = rect.left;
-      const spaceAbove = rect.top;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      let placement = 'right';
-      let top = rect.top + (rect.height - tipRect.height) / 2;
-      let left = rect.right + gap;
-
-      if (spaceRight < tipRect.width + gap && spaceLeft > tipRect.width + gap) {
-        placement = 'left';
-        left = rect.left - tipRect.width - gap;
-      } else if (spaceRight < tipRect.width + gap && spaceAbove > tipRect.height + gap) {
-        placement = 'above';
-        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
-        top = rect.top - tipRect.height - gap;
-      } else if (spaceRight < tipRect.width + gap && spaceBelow > tipRect.height + gap) {
-        placement = 'below';
-        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
-        top = rect.bottom + gap;
-      }
-
-      tip.dataset.placement = placement;
-      tip.style.position = 'fixed';
-      tip.style.left = `${Math.max(viewportPadding, left)}px`;
-      tip.style.top = `${Math.max(viewportPadding, top)}px`;
-      tip.style.maxWidth = `${Math.min(280, window.innerWidth - viewportPadding * 2)}px`;
-
-      activeValidationControl = control;
-      activeValidationTooltip = tip;
-
-      activeValidationHandler = () => {
-        if (isResolved()) {
-          clearValidationFeedback();
-        }
-      };
-
-      control.addEventListener('input', activeValidationHandler);
-      control.addEventListener('change', activeValidationHandler);
-    };
-
-    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
-    const password = step.querySelector('#password');
-    const confirmPassword = step.querySelector('#confirm-password');
-
-    for (const control of controls) {
-      if (control.type === 'checkbox' && control.required && !control.checked) {
-        control.setCustomValidity('Please check this box before continuing.');
-      } else if (control.type === 'checkbox') {
-        control.setCustomValidity('');
-      }
-
-      if (!control.checkValidity()) {
-        showValidationFeedback(control, control.validationMessage || 'Please complete this field.');
-        control.focus({preventScroll: false});
-        control.scrollIntoView({behavior: 'smooth', block: 'center'});
-        return false;
-      }
-    }
-
-    if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
-      showValidationFeedback(confirmPassword, 'Passwords do not match.', () => {
-        return confirmPassword.checkValidity() && password.value === confirmPassword.value;
-      });
-      confirmPassword.focus({preventScroll: false});
-      confirmPassword.scrollIntoView({behavior: 'smooth', block: 'center'});
-      return false;
-    }
-
-    // all good
-    return true;
-  };
-}
 
 if (navToggle && siteNav) {
   navToggle.addEventListener('click', () => {
@@ -227,39 +111,87 @@ if (donorWizard && typeof window.setupDonorWizard !== 'function') {
   };
 
   const validateStep = (step) => {
-    const clearValidationFeedback = () => {
-      if (activeValidationControl && activeValidationHandler) {
-        activeValidationControl.removeEventListener('input', activeValidationHandler);
-        activeValidationControl.removeEventListener('change', activeValidationHandler);
-        activeValidationControl.classList.remove('input-error-shake');
-        activeValidationControl.removeAttribute('aria-describedby');
+    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
+    const password = step.querySelector('#password');
+    const confirmPassword = step.querySelector('#confirm-password');
+    
+    // Collect all invalid controls
+    const invalidControls = [];
+    let firstInvalidControl = null;
+    let passwordMismatch = false;
+
+    for (const control of controls) {
+      if (control.type === 'checkbox' && control.required && !control.checked) {
+        control.setCustomValidity('Please check this box before continuing.');
+      } else if (control.type === 'checkbox') {
+        control.setCustomValidity('');
       }
 
+      if (!control.checkValidity()) {
+        invalidControls.push(control);
+        if (!firstInvalidControl) {
+          firstInvalidControl = control;
+        }
+      }
+    }
+
+    // Check password match
+    if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
+      passwordMismatch = true;
+      invalidControls.push(confirmPassword);
+      if (!firstInvalidControl) {
+        firstInvalidControl = confirmPassword;
+      }
+    }
+
+    // If there are any invalid controls, apply animations and feedback to all of them
+    if (invalidControls.length > 0) {
+      // Remove existing animations from all controls
+      document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
+      
+      // Apply shake animation and handlers to all invalid controls
+      invalidControls.forEach((control) => {
+        // Avoid duplicates
+        if (!control.classList.contains('input-error-shake')) {
+          control.classList.add('input-error-shake');
+          
+          // Create and attach input/change listeners for this control
+          const validationHandler = () => {
+            if (control.checkValidity()) {
+              control.classList.remove('input-error-shake');
+              control.removeEventListener('input', validationHandler);
+              control.removeEventListener('change', validationHandler);
+            }
+          };
+          
+          control.removeEventListener('input', validationHandler);
+          control.removeEventListener('change', validationHandler);
+          control.addEventListener('input', validationHandler);
+          control.addEventListener('change', validationHandler);
+        }
+      });
+
+      // Show tooltip for the first invalid field
       if (activeValidationTooltip) {
         activeValidationTooltip.remove();
       }
-
-      activeValidationControl = null;
-      activeValidationTooltip = null;
-      activeValidationHandler = null;
-      document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
-    };
-
-    const showValidationFeedback = (control, message, isResolved = () => control.checkValidity()) => {
-      clearValidationFeedback();
-
-      control.classList.add('input-error-shake');
-      control.setAttribute('aria-describedby', 'field-tooltip');
 
       const tip = document.createElement('div');
       tip.id = 'field-tooltip';
       tip.className = 'field-tooltip';
       tip.setAttribute('role', 'status');
       tip.setAttribute('aria-live', 'polite');
-      tip.textContent = message;
+      
+      if (passwordMismatch) {
+        tip.textContent = 'Passwords do not match.';
+      } else {
+        tip.textContent = firstInvalidControl.validationMessage || 'Please complete this field.';
+      }
+      
       document.body.appendChild(tip);
+      activeValidationTooltip = tip;
 
-      const rect = control.getBoundingClientRect();
+      const rect = firstInvalidControl.getBoundingClientRect();
       const tipRect = tip.getBoundingClientRect();
       const gap = 14;
       const viewportPadding = 10;
@@ -290,54 +222,20 @@ if (donorWizard && typeof window.setupDonorWizard !== 'function') {
       tip.style.top = `${Math.max(viewportPadding, top)}px`;
       tip.style.maxWidth = `${Math.min(280, window.innerWidth - viewportPadding * 2)}px`;
 
-      activeValidationControl = control;
-      activeValidationTooltip = tip;
-
-      activeValidationHandler = () => {
-        if (isResolved()) {
-          clearValidationFeedback();
-        }
-      };
-
-      control.addEventListener('input', activeValidationHandler);
-      control.addEventListener('change', activeValidationHandler);
-    };
-
-    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
-    const password = step.querySelector('#password');
-    const confirmPassword = step.querySelector('#confirm-password');
-
-    // find first invalid control
-    for (const control of controls) {
-      // checkbox custom validity
-      if (control.type === 'checkbox' && control.required && !control.checked) {
-        control.setCustomValidity('Please check this box before continuing.');
-      } else if (control.type === 'checkbox') {
-        control.setCustomValidity('');
-      }
-
-      if (!control.checkValidity()) {
-        showValidationFeedback(control, control.validationMessage || 'Please complete this field.');
-
-        control.focus({preventScroll: false});
-        control.scrollIntoView({behavior: 'smooth', block: 'center'});
-
-        return false;
-      }
-    }
-
-    // password match check
-    if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
-      showValidationFeedback(confirmPassword, 'Passwords do not match.', () => {
-        return confirmPassword.checkValidity() && password.value === confirmPassword.value;
-      });
-      confirmPassword.focus({preventScroll: false});
-      confirmPassword.scrollIntoView({behavior: 'smooth', block: 'center'});
+      // Scroll to and focus the first invalid field
+      firstInvalidControl.focus({preventScroll: false});
+      firstInvalidControl.scrollIntoView({behavior: 'smooth', block: 'center'});
 
       return false;
     }
 
-    clearValidationFeedback();
+    // all good - remove any lingering animations
+    document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
+    if (activeValidationTooltip) {
+      activeValidationTooltip.remove();
+      activeValidationTooltip = null;
+    }
+    
     return true;
   };
 
