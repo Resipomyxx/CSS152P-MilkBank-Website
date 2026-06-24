@@ -49,23 +49,35 @@ function setupDonorWizard() {
   const wizard = document.querySelector('[data-donor-wizard]');
   if (!wizard) return;
 
-  // Handle next/back button clicks WITHOUT submitting form
-  const actionButtons = wizard.querySelectorAll('button[data-step-action]');
-  actionButtons.forEach(button => {
-    button.addEventListener('click', (e) => {
-      if (button.dataset.stepAction === 'back') {
-        e.preventDefault();
-        previousStep();
-      } else if (button.dataset.stepAction === 'next' && button.type === 'button') {
-        // Only prevent default for navigation buttons, not submit buttons
+  // Delegate clicks inside the wizard for navigation buttons
+  wizard.addEventListener('click', (e) => {
+    const button = e.target.closest('button[data-step-action]');
+    if (!button || !wizard.contains(button)) return;
+
+    const action = button.dataset.stepAction;
+
+    if (action === 'back') {
+      e.preventDefault();
+      previousStep();
+      return;
+    }
+
+    if (action === 'save') {
+      e.preventDefault();
+      // Save draft functionality could go here
+      alert('Draft saved!');
+      return;
+    }
+
+    if (action === 'next') {
+      // For non-final steps, make sure next button is a button (not submit) to avoid form submit
+      if (button.type === 'button') {
         e.preventDefault();
         nextStep();
-      } else if (button.dataset.stepAction === 'save') {
-        e.preventDefault();
-        // Save draft functionality could go here
-        alert('Draft saved!');
+        return;
       }
-    });
+      // If button is submit, allow the form submit handler to run (handleDonorRegistration)
+    }
   });
 
   // Ensure first active step is visible on load
@@ -73,6 +85,15 @@ function setupDonorWizard() {
   if (active) {
     active.scrollIntoView({behavior: 'auto', block: 'start'});
     updateStepLabel();
+
+    // Ensure next button uses 'button' type on non-final steps to prevent accidental submit
+    const wizardEl = document.querySelector('[data-donor-wizard]');
+    const nextBtn = wizardEl.querySelector('button[data-step-action="next"]');
+    const steps = Array.from(wizardEl.querySelectorAll('.donor-step'));
+    const activeIndex = steps.indexOf(active) + 1;
+    if (nextBtn) {
+      nextBtn.type = (activeIndex === steps.length) ? 'submit' : 'button';
+    }
   }
 }
 
@@ -146,8 +167,10 @@ function updateStepLabel() {
   if (nextBtn) {
     if (currentIndex === steps.length) {
       nextBtn.textContent = 'Complete Registration';
+      nextBtn.type = 'submit';
     } else {
       nextBtn.textContent = 'Next Step';
+      nextBtn.type = 'button';
     }
   }
 }
