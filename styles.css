@@ -1118,7 +1118,7 @@ a {
 }
 
 .field-tooltip {
-  position: absolute;
+  position: fixed;
   z-index: 9999;
   max-width: 260px;
   background: #0f1724;
@@ -1143,13 +1143,27 @@ a {
   transform: translateY(-50%);
 }
 
-.field-tooltip.field-tooltip-above::after {
-  /* when above, flip the arrow to point downwards */
+.field-tooltip[data-placement="left"]::after {
+  left: auto;
+  right: -8px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #0f1724;
+}
+
+.field-tooltip[data-placement="above"]::after {
   border-width: 0 8px 8px 8px;
   border-color: transparent transparent #0f1724 transparent;
   left: 50%;
   top: auto;
   bottom: -8px;
+  transform: translateX(-50%);
+}
+
+.field-tooltip[data-placement="below"]::after {
+  border-width: 8px 8px 0 8px;
+  border-color: #0f1724 transparent transparent transparent;
+  left: 50%;
+  top: -8px;
   transform: translateX(-50%);
 }
 

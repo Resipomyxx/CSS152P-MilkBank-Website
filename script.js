@@ -75,6 +75,9 @@ if (donorWizard) {
   const saveButton = donorWizard.querySelector('[data-step-action="save"]');
 
   let currentStep = 0;
+  let activeValidationControl = null;
+  let activeValidationTooltip = null;
+  let activeValidationHandler = null;
 
   const updateWizard = () => {
     steps.forEach((step, index) => {
@@ -107,17 +110,80 @@ if (donorWizard) {
   };
 
   const validateStep = (step) => {
-    // helper to remove any existing tooltip and shake classes
-    const removeTooltip = () => {
-      const existing = document.getElementById('field-tooltip');
-      if (existing) existing.remove();
+    const clearValidationFeedback = () => {
+      if (activeValidationControl && activeValidationHandler) {
+        activeValidationControl.removeEventListener('input', activeValidationHandler);
+        activeValidationControl.removeEventListener('change', activeValidationHandler);
+        activeValidationControl.classList.remove('input-error-shake');
+        activeValidationControl.removeAttribute('aria-describedby');
+      }
+
+      if (activeValidationTooltip) {
+        activeValidationTooltip.remove();
+      }
+
+      activeValidationControl = null;
+      activeValidationTooltip = null;
+      activeValidationHandler = null;
       document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
-      document.querySelectorAll('[data-tooltip-listener]').forEach((el) => {
-        const fn = el.dataset.tooltipListener && window[el.dataset.tooltipListener];
-        if (fn) el.removeEventListener('input', fn);
-        delete el.dataset.tooltipListener;
-        el.removeAttribute('aria-describedby');
-      });
+    };
+
+    const showValidationFeedback = (control, message, isResolved = () => control.checkValidity()) => {
+      clearValidationFeedback();
+
+      control.classList.add('input-error-shake');
+      control.setAttribute('aria-describedby', 'field-tooltip');
+
+      const tip = document.createElement('div');
+      tip.id = 'field-tooltip';
+      tip.className = 'field-tooltip';
+      tip.setAttribute('role', 'status');
+      tip.setAttribute('aria-live', 'polite');
+      tip.textContent = message;
+      document.body.appendChild(tip);
+
+      const rect = control.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+      const gap = 14;
+      const viewportPadding = 10;
+      const spaceRight = window.innerWidth - rect.right;
+      const spaceLeft = rect.left;
+      const spaceAbove = rect.top;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      let placement = 'right';
+      let top = rect.top + (rect.height - tipRect.height) / 2;
+      let left = rect.right + gap;
+
+      if (spaceRight < tipRect.width + gap && spaceLeft > tipRect.width + gap) {
+        placement = 'left';
+        left = rect.left - tipRect.width - gap;
+      } else if (spaceRight < tipRect.width + gap && spaceAbove > tipRect.height + gap) {
+        placement = 'above';
+        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
+        top = rect.top - tipRect.height - gap;
+      } else if (spaceRight < tipRect.width + gap && spaceBelow > tipRect.height + gap) {
+        placement = 'below';
+        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
+        top = rect.bottom + gap;
+      }
+
+      tip.dataset.placement = placement;
+      tip.style.position = 'fixed';
+      tip.style.left = `${Math.max(viewportPadding, left)}px`;
+      tip.style.top = `${Math.max(viewportPadding, top)}px`;
+      tip.style.maxWidth = `${Math.min(280, window.innerWidth - viewportPadding * 2)}px`;
+
+      activeValidationControl = control;
+      activeValidationTooltip = tip;
+
+      activeValidationHandler = () => {
+        if (isResolved()) {
+          clearValidationFeedback();
+        }
+      };
+
+      control.addEventListener('input', activeValidationHandler);
+      control.addEventListener('change', activeValidationHandler);
     };
 
     const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
@@ -134,55 +200,10 @@ if (donorWizard) {
       }
 
       if (!control.checkValidity()) {
-        // show a single animated indicator pointing to this control
-        removeTooltip();
-        control.classList.add('input-error-shake');
+        showValidationFeedback(control, control.validationMessage || 'Please complete this field.');
 
-        const msg = control.validationMessage || 'Please complete this field.';
-        const tip = document.createElement('div');
-        tip.id = 'field-tooltip';
-        tip.className = 'field-tooltip';
-        tip.textContent = msg;
-        document.body.appendChild(tip);
-
-        // position the tooltip to the right by default
-        const rect = control.getBoundingClientRect();
-        const tipRect = tip.getBoundingClientRect();
-        const spaceRight = window.innerWidth - rect.right;
-        const top = window.scrollY + rect.top + (rect.height - tipRect.height) / 2;
-        let left = window.scrollX + rect.right + 12;
-
-        // if not enough space on the right, place above the field
-        if (spaceRight < tipRect.width + 24) {
-          left = window.scrollX + rect.left + (rect.width - tipRect.width) / 2;
-          tip.style.left = `${Math.max(8, left)}px`;
-          tip.style.top = `${Math.max(8, window.scrollY + rect.top - tipRect.height - 12)}px`;
-          tip.classList.add('field-tooltip-above');
-        } else {
-          tip.style.left = `${left}px`;
-          tip.style.top = `${Math.max(8, top)}px`;
-          tip.classList.remove('field-tooltip-above');
-        }
-
-        // accessibility
-        control.setAttribute('aria-describedby', 'field-tooltip');
-
-        // focus the field so user can correct; ensure visible on small screens
         control.focus({preventScroll: false});
         control.scrollIntoView({behavior: 'smooth', block: 'center'});
-
-        // add listener to clear when fixed
-        const listener = () => {
-          if (control.checkValidity()) {
-            removeTooltip();
-          }
-        };
-
-        // store a reference name on window so it can be removed reliably
-        const listenerName = `tooltipListener_${Date.now()}_${Math.floor(Math.random()*10000)}`;
-        window[listenerName] = listener;
-        control.dataset.tooltipListener = listenerName;
-        control.addEventListener('input', listener);
 
         return false;
       }
@@ -190,45 +211,16 @@ if (donorWizard) {
 
     // password match check
     if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
-      removeTooltip();
-      confirmPassword.classList.add('input-error-shake');
-
-      const msg = 'Passwords do not match.';
-      const tip = document.createElement('div');
-      tip.id = 'field-tooltip';
-      tip.className = 'field-tooltip';
-      tip.textContent = msg;
-      document.body.appendChild(tip);
-
-      const rect = confirmPassword.getBoundingClientRect();
-      const tipRect = tip.getBoundingClientRect();
-      const left = window.scrollX + rect.right + 12;
-      const top = window.scrollY + rect.top + (rect.height - tipRect.height) / 2;
-      tip.style.left = `${left}px`;
-      tip.style.top = `${Math.max(8, top)}px`;
-
-      confirmPassword.setAttribute('aria-describedby', 'field-tooltip');
+      showValidationFeedback(confirmPassword, 'Passwords do not match.', () => {
+        return confirmPassword.checkValidity() && password.value === confirmPassword.value;
+      });
       confirmPassword.focus({preventScroll: false});
       confirmPassword.scrollIntoView({behavior: 'smooth', block: 'center'});
-
-      const listener = () => {
-        if (confirmPassword.checkValidity() && password.value === confirmPassword.value) {
-          removeTooltip();
-        }
-      };
-      const listenerName = `tooltipListener_${Date.now()}_${Math.floor(Math.random()*10000)}`;
-      window[listenerName] = listener;
-      confirmPassword.dataset.tooltipListener = listenerName;
-      confirmPassword.addEventListener('input', listener);
 
       return false;
     }
 
-    // all good
-    // clear any lingering tooltip
-    const existing = document.getElementById('field-tooltip');
-    if (existing) existing.remove();
-    document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
+    clearValidationFeedback();
     return true;
   };
 
@@ -380,4 +372,3 @@ if (prevButton && nextButton) {
 
   window.addEventListener('resize', () => updateCarousel());
 }
-
