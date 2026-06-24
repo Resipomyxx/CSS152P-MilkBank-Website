@@ -5,6 +5,123 @@ const reveals = document.querySelectorAll('.reveal');
 const programRows = document.querySelectorAll('.program-row[data-program-volume]');
 const donorWizard = document.querySelector('[data-donor-wizard]');
 
+// Ensure validateStep is always available globally so other scripts (donor.js) can call it.
+if (typeof window.validateStep !== 'function') {
+  window.validateStep = (step) => {
+    // Local copies of helpers to show/clear validation feedback
+    let activeValidationControl = null;
+    let activeValidationTooltip = null;
+    let activeValidationHandler = null;
+
+    const clearValidationFeedback = () => {
+      if (activeValidationControl && activeValidationHandler) {
+        activeValidationControl.removeEventListener('input', activeValidationHandler);
+        activeValidationControl.removeEventListener('change', activeValidationHandler);
+        activeValidationControl.classList.remove('input-error-shake');
+        activeValidationControl.removeAttribute('aria-describedby');
+      }
+
+      if (activeValidationTooltip) {
+        activeValidationTooltip.remove();
+      }
+
+      activeValidationControl = null;
+      activeValidationTooltip = null;
+      activeValidationHandler = null;
+      document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
+    };
+
+    const showValidationFeedback = (control, message, isResolved = () => control.checkValidity()) => {
+      clearValidationFeedback();
+
+      control.classList.add('input-error-shake');
+      control.setAttribute('aria-describedby', 'field-tooltip');
+
+      const tip = document.createElement('div');
+      tip.id = 'field-tooltip';
+      tip.className = 'field-tooltip';
+      tip.setAttribute('role', 'status');
+      tip.setAttribute('aria-live', 'polite');
+      tip.textContent = message;
+      document.body.appendChild(tip);
+
+      const rect = control.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+      const gap = 14;
+      const viewportPadding = 10;
+      const spaceRight = window.innerWidth - rect.right;
+      const spaceLeft = rect.left;
+      const spaceAbove = rect.top;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      let placement = 'right';
+      let top = rect.top + (rect.height - tipRect.height) / 2;
+      let left = rect.right + gap;
+
+      if (spaceRight < tipRect.width + gap && spaceLeft > tipRect.width + gap) {
+        placement = 'left';
+        left = rect.left - tipRect.width - gap;
+      } else if (spaceRight < tipRect.width + gap && spaceAbove > tipRect.height + gap) {
+        placement = 'above';
+        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
+        top = rect.top - tipRect.height - gap;
+      } else if (spaceRight < tipRect.width + gap && spaceBelow > tipRect.height + gap) {
+        placement = 'below';
+        left = Math.max(viewportPadding, rect.left + (rect.width - tipRect.width) / 2);
+        top = rect.bottom + gap;
+      }
+
+      tip.dataset.placement = placement;
+      tip.style.position = 'fixed';
+      tip.style.left = `${Math.max(viewportPadding, left)}px`;
+      tip.style.top = `${Math.max(viewportPadding, top)}px`;
+      tip.style.maxWidth = `${Math.min(280, window.innerWidth - viewportPadding * 2)}px`;
+
+      activeValidationControl = control;
+      activeValidationTooltip = tip;
+
+      activeValidationHandler = () => {
+        if (isResolved()) {
+          clearValidationFeedback();
+        }
+      };
+
+      control.addEventListener('input', activeValidationHandler);
+      control.addEventListener('change', activeValidationHandler);
+    };
+
+    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
+    const password = step.querySelector('#password');
+    const confirmPassword = step.querySelector('#confirm-password');
+
+    for (const control of controls) {
+      if (control.type === 'checkbox' && control.required && !control.checked) {
+        control.setCustomValidity('Please check this box before continuing.');
+      } else if (control.type === 'checkbox') {
+        control.setCustomValidity('');
+      }
+
+      if (!control.checkValidity()) {
+        showValidationFeedback(control, control.validationMessage || 'Please complete this field.');
+        control.focus({preventScroll: false});
+        control.scrollIntoView({behavior: 'smooth', block: 'center'});
+        return false;
+      }
+    }
+
+    if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
+      showValidationFeedback(confirmPassword, 'Passwords do not match.', () => {
+        return confirmPassword.checkValidity() && password.value === confirmPassword.value;
+      });
+      confirmPassword.focus({preventScroll: false});
+      confirmPassword.scrollIntoView({behavior: 'smooth', block: 'center'});
+      return false;
+    }
+
+    // all good
+    return true;
+  };
+}
+
 if (navToggle && siteNav) {
   navToggle.addEventListener('click', () => {
     const expanded = navToggle.getAttribute('aria-expanded') === 'true';
