@@ -1100,6 +1100,59 @@ a {
   font-size: 1.15rem;
 }
 
+/* Validation: shaking field and pointing tooltip */
+.input-error-shake {
+  animation: shake 420ms cubic-bezier(.36,.07,.19,.97);
+  border-color: #e05a5a !important;
+  box-shadow: 0 6px 18px rgba(224,90,90,0.14);
+  position: relative;
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+  100% { transform: translateX(0); }
+}
+
+.field-tooltip {
+  position: absolute;
+  z-index: 9999;
+  max-width: 260px;
+  background: #0f1724;
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.45);
+  pointer-events: none;
+}
+
+.field-tooltip::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #0f1724 transparent transparent;
+  left: -8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.field-tooltip.field-tooltip-above::after {
+  /* when above, flip the arrow to point downwards */
+  border-width: 0 8px 8px 8px;
+  border-color: transparent transparent #0f1724 transparent;
+  left: 50%;
+  top: auto;
+  bottom: -8px;
+  transform: translateX(-50%);
+}
+
 .hero-card-side {
   padding: 1.3rem 1.35rem;
   align-self: end;

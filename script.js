@@ -107,35 +107,128 @@ if (donorWizard) {
   };
 
   const validateStep = (step) => {
-    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled);
+    // helper to remove any existing tooltip and shake classes
+    const removeTooltip = () => {
+      const existing = document.getElementById('field-tooltip');
+      if (existing) existing.remove();
+      document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
+      document.querySelectorAll('[data-tooltip-listener]').forEach((el) => {
+        const fn = el.dataset.tooltipListener && window[el.dataset.tooltipListener];
+        if (fn) el.removeEventListener('input', fn);
+        delete el.dataset.tooltipListener;
+        el.removeAttribute('aria-describedby');
+      });
+    };
+
+    const controls = Array.from(step.querySelectorAll('input, select, textarea')).filter((control) => !control.disabled && control.offsetParent !== null);
     const password = step.querySelector('#password');
     const confirmPassword = step.querySelector('#confirm-password');
 
+    // find first invalid control
     for (const control of controls) {
-      if (control.type === 'checkbox' && !control.checked) {
+      // checkbox custom validity
+      if (control.type === 'checkbox' && control.required && !control.checked) {
         control.setCustomValidity('Please check this box before continuing.');
       } else if (control.type === 'checkbox') {
         control.setCustomValidity('');
       }
 
       if (!control.checkValidity()) {
-        control.reportValidity();
-        control.focus();
+        // show a single animated indicator pointing to this control
+        removeTooltip();
+        control.classList.add('input-error-shake');
+
+        const msg = control.validationMessage || 'Please complete this field.';
+        const tip = document.createElement('div');
+        tip.id = 'field-tooltip';
+        tip.className = 'field-tooltip';
+        tip.textContent = msg;
+        document.body.appendChild(tip);
+
+        // position the tooltip to the right by default
+        const rect = control.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const spaceRight = window.innerWidth - rect.right;
+        const top = window.scrollY + rect.top + (rect.height - tipRect.height) / 2;
+        let left = window.scrollX + rect.right + 12;
+
+        // if not enough space on the right, place above the field
+        if (spaceRight < tipRect.width + 24) {
+          left = window.scrollX + rect.left + (rect.width - tipRect.width) / 2;
+          tip.style.left = `${Math.max(8, left)}px`;
+          tip.style.top = `${Math.max(8, window.scrollY + rect.top - tipRect.height - 12)}px`;
+          tip.classList.add('field-tooltip-above');
+        } else {
+          tip.style.left = `${left}px`;
+          tip.style.top = `${Math.max(8, top)}px`;
+          tip.classList.remove('field-tooltip-above');
+        }
+
+        // accessibility
+        control.setAttribute('aria-describedby', 'field-tooltip');
+
+        // focus the field so user can correct; ensure visible on small screens
+        control.focus({preventScroll: false});
+        control.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+        // add listener to clear when fixed
+        const listener = () => {
+          if (control.checkValidity()) {
+            removeTooltip();
+          }
+        };
+
+        // store a reference name on window so it can be removed reliably
+        const listenerName = `tooltipListener_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+        window[listenerName] = listener;
+        control.dataset.tooltipListener = listenerName;
+        control.addEventListener('input', listener);
+
         return false;
       }
     }
 
+    // password match check
     if (password && confirmPassword && password.value && confirmPassword.value && password.value !== confirmPassword.value) {
-      confirmPassword.setCustomValidity('Passwords do not match.');
-      confirmPassword.reportValidity();
-      confirmPassword.focus();
+      removeTooltip();
+      confirmPassword.classList.add('input-error-shake');
+
+      const msg = 'Passwords do not match.';
+      const tip = document.createElement('div');
+      tip.id = 'field-tooltip';
+      tip.className = 'field-tooltip';
+      tip.textContent = msg;
+      document.body.appendChild(tip);
+
+      const rect = confirmPassword.getBoundingClientRect();
+      const tipRect = tip.getBoundingClientRect();
+      const left = window.scrollX + rect.right + 12;
+      const top = window.scrollY + rect.top + (rect.height - tipRect.height) / 2;
+      tip.style.left = `${left}px`;
+      tip.style.top = `${Math.max(8, top)}px`;
+
+      confirmPassword.setAttribute('aria-describedby', 'field-tooltip');
+      confirmPassword.focus({preventScroll: false});
+      confirmPassword.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+      const listener = () => {
+        if (confirmPassword.checkValidity() && password.value === confirmPassword.value) {
+          removeTooltip();
+        }
+      };
+      const listenerName = `tooltipListener_${Date.now()}_${Math.floor(Math.random()*10000)}`;
+      window[listenerName] = listener;
+      confirmPassword.dataset.tooltipListener = listenerName;
+      confirmPassword.addEventListener('input', listener);
+
       return false;
     }
 
-    if (confirmPassword) {
-      confirmPassword.setCustomValidity('');
-    }
-
+    // all good
+    // clear any lingering tooltip
+    const existing = document.getElementById('field-tooltip');
+    if (existing) existing.remove();
+    document.querySelectorAll('.input-error-shake').forEach((el) => el.classList.remove('input-error-shake'));
     return true;
   };
 
