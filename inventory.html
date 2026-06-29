@@ -98,6 +98,57 @@
         </div>
       </section>
 
+      <script>
+        async function loadInventory() {
+          try {
+            const batches = await window.supabase.getInventory();
+
+            // if the helper recorded an error, show it in the table for debugging
+            const err = window.supabaseDebug && window.supabaseDebug.lastInventoryError;
+            if (err) {
+              document.getElementById('inventory-body').innerHTML =
+                `<tr><td colspan="5" style="text-align:center;color:crimson">Error loading inventory: ${err.message || err}</td></tr>`;
+              return;
+            }
+
+            renderTable(batches);
+          } catch (e) {
+            document.getElementById('inventory-body').innerHTML =
+              `<tr><td colspan="5" style="text-align:center;color:crimson">Error loading inventory: ${e.message || e}</td></tr>`;
+            console.error('loadInventory error:', e);
+          }
+        }
+
+        loadInventory();
+
+        function renderTable(rows) {
+          if (!rows || rows.length === 0) {
+            document.getElementById('inventory-body').innerHTML =
+              '<tr><td colspan="5" style="text-align:center">No inventory records found.</td></tr>';
+            return;
+          }
+
+          const today = new Date();
+          document.getElementById('inventory-body').innerHTML = rows.map(b => {
+            const expiry = b.expiry_date ? new Date(b.expiry_date) : null;
+            const daysLeft = expiry ? Math.ceil((expiry - today) / 86400000) : null;
+            const expiryClass = daysLeft !== null && daysLeft <= 7 ? 'expiry-warn' : 'expiry-ok';
+            const expiryText = expiry
+              ? expiry.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
+              : '—';
+
+            return `
+              <tr>
+                <td>${b.batch_number}</td>
+                <td>${b.program ?? '—'}</td>
+                <td>${b.volume_available ?? 0} mL</td>
+                <td><span class="${expiryClass}">${expiryText}</span></td>
+                <td><span class="status-pill s-${b.status.toLowerCase()}">${b.status}</span></td>
+              </tr>`;
+          }).join('');
+        }
+      </script>
+
       <section class="content-section reveal" id="table">
         <div class="section-heading">
           <p class="eyebrow">Batch table</p>
@@ -108,46 +159,13 @@
             <thead>
               <tr>
                 <th>Batch</th>
-                <th>Donor</th>
                 <th>Program</th>
                 <th>Volume</th>
                 <th>Expiry</th>
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>B2025-048</td>
-                <td>Cruz, A.</td>
-                <td>Supsup Todo</td>
-                <td>200 mL</td>
-                <td><span class="expiry-warn">Jun 4, 2026</span></td>
-                <td><span class="status-pill s-ready">Ready</span></td>
-              </tr>
-              <tr>
-                <td>B2025-049</td>
-                <td>Santos, L.</td>
-                <td>Milky Way</td>
-                <td>180 mL</td>
-                <td><span class="expiry-warn">Jun 5, 2026</span></td>
-                <td><span class="status-pill s-pasteurized">Pasteurized</span></td>
-              </tr>
-              <tr>
-                <td>B2025-050</td>
-                <td>Reyes, M.</td>
-                <td>Mom's Act</td>
-                <td>160 mL</td>
-                <td><span class="expiry-ok">Jun 14, 2026</span></td>
-                <td><span class="status-pill s-screened">Screened</span></td>
-              </tr>
-              <tr>
-                <td>B2025-051</td>
-                <td>Lim, R.</td>
-                <td>Milky Way</td>
-                <td>210 mL</td>
-                <td><span class="expiry-ok">Jun 18, 2026</span></td>
-                <td><span class="status-pill s-ready">Ready</span></td>
-              </tr>
+            <tbody id="inventory-body">
             </tbody>
           </table>
         </div>

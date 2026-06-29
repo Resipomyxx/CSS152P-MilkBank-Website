@@ -259,6 +259,28 @@ async function getProducts(category = null) {
   }
 }
 
+async function getInventory(category = null) {
+  try {
+    let query = supabaseClient.from('inventory').select('*');
+
+    if (category) {
+      query = query.eq('category', category);
+    }
+
+    const { data, error } = await query;
+    // store debug info on window for easier inspection in the browser console
+    window.supabaseDebug = window.supabaseDebug || {};
+    window.supabaseDebug.lastInventoryData = data || [];
+    window.supabaseDebug.lastInventoryError = error || null;
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Get inventory error:', error);
+    return [];
+  }
+}
+
 /**
  * Get a single product by ID
  * @param {string} productId 
@@ -502,7 +524,7 @@ async function getAllStaff() {
 window.supabase = {
   signUp, signIn, signOut, getCurrentUser, getUserProfile, updateUserProfile,
   createDonorProfile, getActiveDonors, getCurrentUserDonor,
-  getProducts, getProduct, addProduct, updateProductInventory,
+  getInventory, getProducts, getProduct, addProduct, updateProductInventory,
   recordDonation, getUserDonationHistory, getAllDonations,
   createStaffMember, updateStaffMember, deleteStaffMember, getAllStaff
 };
