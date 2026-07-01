@@ -1986,6 +1986,83 @@ flex-direction: column;
   margin-bottom: 0;
 }
 
+.donor-check-list li.is-eligible {
+  background: rgba(31, 122, 107, 0.06);
+}
+
+.donor-check-list li.is-eligible::before {
+  content: "✓";
+  background: var(--primary);
+}
+
+.donor-check-list li.is-ineligible {
+  background: rgba(220, 53, 69, 0.08);
+}
+
+.donor-check-list li.is-ineligible::before {
+  content: "✕";
+  background: #dc3545;
+}
+
+.donor-check-list li.is-review {
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.donor-check-list li.is-review::before {
+  content: "!";
+  background: #f59e0b;
+}
+
+/* Yes / No radio question groups in Medical History */
+.donor-yn-group {
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+.donor-yn-group legend {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+  margin-bottom: 0.65rem;
+  padding: 0;
+}
+
+.donor-yn-options {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.donor-yn-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.4rem 1.2rem;
+  border: 1.5px solid var(--border, #d1d5db);
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.donor-yn-label:has(input:checked) {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+
+.donor-yn-label input[type="radio"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+  flex-shrink: 0;
+}
+
 .donor-actions {
   display: flex;
   width: 100%;
