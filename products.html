@@ -115,8 +115,29 @@
           <div class="products-grid" id="products-grid" aria-label="Product catalog">
             <!-- Products will load here dynamically -->
           </div>
+        </section>
+      </section>
 
-          <script>
+      <section class="content-section reveal" id="products-timeline">
+        <div class="section-heading">
+          <p class="eyebrow">Live activity</p>
+          <h2>Product updates in real time.</h2>
+        </div>
+
+        <article class="history-panel" id="products-timeline-panel">
+          <div class="history-panel-head">
+            <h2>Products Activity Timeline</h2>
+          </div>
+
+          <div class="history-timeline-list" id="products-timeline-list">
+            <p style="padding: 2rem; text-align: center; color: var(--muted);">
+              Loading product activity...
+            </p>
+          </div>
+        </article>
+      </section>
+
+      <script>
             const iconMap = {
               'Double electric breast pump': '🍼',
               'Single manual breast pump': '👩‍🍼',
@@ -339,9 +360,6 @@
 
             loadProducts();
           </script>
-        
-        </section>
-      </section>
     </main>
 
     <footer class="site-footer">
@@ -376,6 +394,7 @@
   </div>
 
   <script src="script.js"></script>
+  <script src="products-timeline.js"></script>
 </body>
 </html>
 
