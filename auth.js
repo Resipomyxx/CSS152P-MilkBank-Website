@@ -9,6 +9,16 @@
 // REGISTRATION FORM HANDLER
 // ===================================
 
+window.REGISTRATION_DRAFT_KEY = window.REGISTRATION_DRAFT_KEY || 'lactocare.registrationDraft';
+
+function saveRegistrationDraft(draftData) {
+  try {
+    sessionStorage.setItem(window.REGISTRATION_DRAFT_KEY, JSON.stringify(draftData));
+  } catch (error) {
+    console.error('Save registration draft error:', error);
+  }
+}
+
 async function handleRegister(event) {
   event.preventDefault();
 
@@ -20,6 +30,15 @@ async function handleRegister(event) {
   const lastName = document.getElementById('last-name').value.trim();
   const fullName = `${firstName} ${lastName}`.trim();
   const userType = document.getElementById('register-user-type').value; // 'donor', 'staff', or 'user'
+
+  saveRegistrationDraft({
+    email,
+    first_name: firstName,
+    last_name: lastName,
+    full_name: fullName,
+    user_type: userType,
+    registration_stage: 'account_creation'
+  });
 
   // Validation
   if (!email || !password) {
@@ -54,13 +73,18 @@ async function handleRegister(event) {
       return;
     }
 
-    // Success
-    showSuccess('register-success', 'Registration successful! Check your email to confirm your account.');
+    let redirectUrl = 'index.html';
+    if (userType === 'donor') {
+      redirectUrl = 'donor-registration.html'; 
+    } else if (userType === 'staff' || userType === 'admin') {
+      redirectUrl = 'staff.html';
+    }
+
+    showSuccess('register-success', 'Registration successful! Taking you to the next step...');
     
-    // Redirect after delay
     setTimeout(() => {
-      window.location.href = 'login.html';
-    }, 2000);
+      window.location.href = redirectUrl;
+    }, 1500);
 
   } catch (error) {
     showError('register-error', 'An unexpected error occurred: ' + error.message);
