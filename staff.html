@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="LactoCare staff dashboard for screening, donor activity, milk requests, and inventory oversight." />
+  <meta name="description" content="LactoCare staff dashboard for screening, donor activity, and inventory oversight." />
   <title>LactoCare | Staff Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -54,7 +54,6 @@
             <nav class="sidebar-nav">
               <a class="is-active" href="#dashboard">Dashboard</a>
               <a href="#donors">Donors</a>
-              <a href="#schedules">Schedules</a>
             </nav>
           </div>
 
@@ -63,7 +62,6 @@
             <nav class="sidebar-nav">
               <a href="#screening">Screening</a>
               <a href="#inventory">Inventory</a>
-              <a href="#dispensing">Dispensing</a>
             </nav>
           </div>
 
@@ -89,38 +87,33 @@
             </div>
           </div>
 
-          <div class="dashboard-banner">3 batches nearing expiry in the next 72 hours. Check inventory.</div>
+          <div class="dashboard-banner" id="expiry-banner">3 batches nearing expiry in the next 72 hours. Check inventory.</div>
 
           <div class="dashboard-stats">
-            <article class="metric-card">
+            <article class="metric-card" id="metric-active-donors" data-metric="active-donors">
               <span>Active donors</span>
               <strong>42</strong>
               <p>+3 this week</p>
             </article>
-            <article class="metric-card">
+            <article class="metric-card" id="metric-pending-screening" data-metric="pending-screening">
               <span>Pending screening</span>
               <strong>7</strong>
               <p>Batches awaiting results</p>
             </article>
-            <article class="metric-card">
+            <article class="metric-card" id="metric-inventory-ml" data-metric="inventory-ml">
               <span>Inventory (mL)</span>
               <strong>3,420</strong>
               <p>Across 18 batches</p>
             </article>
-            <article class="metric-card">
-              <span>Milk requests</span>
-              <strong>5</strong>
-              <p>2 urgent pending</p>
-            </article>
           </div>
 
-          <div class="dashboard-grid-two">
+          <div class="dashboard-grid-full">
             <article class="dashboard-card" id="donors">
               <div class="dashboard-card-head">
                 <h2>Recent batches</h2>
                 <a class="button button-secondary" href="inventory.html">View all</a>
               </div>
-              <div class="batch-list">
+              <div class="batch-list" id="recent-batches-list">
                 <div class="batch-row">
                   <div class="batch-meta">
                     <div class="batch-id">B2025-051</div>
@@ -163,47 +156,6 @@
                 </div>
               </div>
             </article>
-
-            <article class="dashboard-card" id="schedules">
-              <div class="dashboard-card-head">
-                <h2>Milk requests</h2>
-                <a class="button button-secondary" href="#inventory">Manage</a>
-              </div>
-              <div class="request-list">
-                <div class="request-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Baby Rodriguez</div>
-                    <div class="request-hospital">Philippine General Hospital</div>
-                  </div>
-                  <div class="batch-volume">150 mL</div>
-                  <span class="status-pill is-urgent">Urgent</span>
-                </div>
-                <div class="request-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Baby Lim</div>
-                    <div class="request-hospital">Ospital ng Makati</div>
-                  </div>
-                  <div class="batch-volume">100 mL</div>
-                  <span class="status-pill is-urgent">Urgent</span>
-                </div>
-                <div class="request-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Baby Fernandez</div>
-                    <div class="request-hospital">Fabella Hospital</div>
-                  </div>
-                  <div class="batch-volume">200 mL</div>
-                  <span class="status-pill is-normal">Normal</span>
-                </div>
-                <div class="request-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Baby Mendoza</div>
-                    <div class="request-hospital">Ospital ng Makati</div>
-                  </div>
-                  <div class="batch-volume">120 mL</div>
-                  <span class="status-pill is-normal">Normal</span>
-                </div>
-              </div>
-            </article>
           </div>
 
           <article class="dashboard-card inventory-panel" id="inventory">
@@ -228,13 +180,13 @@
             </div>
           </article>
 
-          <div class="dashboard-grid-two">
+          <div class="dashboard-grid-full">
             <article class="dashboard-card" id="screening">
               <div class="dashboard-card-head">
                 <h2>Screening queue</h2>
-                <span class="status-pill is-screened">3 awaiting review</span>
+                <span class="status-pill is-screened" id="screening-queue-count">3 awaiting review</span>
               </div>
-              <div class="batch-list">
+              <div class="batch-list" id="screening-queue-list">
                 <div class="batch-row">
                   <div class="batch-meta">
                     <div class="batch-id">Batch B2025-052</div>
@@ -255,36 +207,6 @@
                     <div class="batch-name">Release documentation ready</div>
                   </div>
                   <span class="status-pill is-ready">Ready</span>
-                </div>
-              </div>
-            </article>
-
-            <article class="dashboard-card" id="dispensing">
-              <div class="dashboard-card-head">
-                <h2>Dispensing status</h2>
-                <span class="status-pill is-ready">2 scheduled today</span>
-              </div>
-              <div class="batch-list">
-                <div class="batch-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Route 01</div>
-                    <div class="batch-name">Bangkal Health Center</div>
-                  </div>
-                  <span class="status-pill is-collected">On route</span>
-                </div>
-                <div class="batch-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Route 02</div>
-                    <div class="batch-name">PGH Manila</div>
-                  </div>
-                  <span class="status-pill is-normal">Queued</span>
-                </div>
-                <div class="batch-row">
-                  <div class="batch-meta">
-                    <div class="batch-id">Route 03</div>
-                    <div class="batch-name">Fabella Hospital</div>
-                  </div>
-                  <span class="status-pill is-normal">Queued</span>
                 </div>
               </div>
             </article>
@@ -404,7 +326,7 @@
             <small>Staff Dashboard</small>
           </span>
         </a>
-        <p>Screening, donor activity, milk requests, and inventory monitoring for staff.</p>
+        <p>Screening, donor activity, and inventory monitoring for staff.</p>
       </div>
       <div class="footer-section">
         <h3>Contact</h3>
