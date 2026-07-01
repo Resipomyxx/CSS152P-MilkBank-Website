@@ -285,9 +285,15 @@ async function handleDonorRegistration(event) {
   const activeStep = wizard.querySelector('.donor-step.is-active');
   const stepIndex = steps.indexOf(activeStep);
   const totalSteps = steps.length;
+  const user = await window.supabase.getCurrentUser();
 
   if (stepIndex < totalSteps - 1) {
     nextStep();
+    return;
+  }
+
+  if (!user) {
+    window.location.href = 'login.html';
     return;
   }
 
@@ -314,10 +320,38 @@ async function handleDonorRegistration(event) {
     submitBtn.textContent = 'Completing registration...';
   }
 
+  const formData = new FormData(form);
+  const personalInformation = {
+    first_name: String(formData.get('first_name') || '').trim(),
+    last_name: String(formData.get('last_name') || '').trim(),
+    birthdate: String(formData.get('date_of_birth') || '').trim(),
+    email: String(formData.get('email') || user.email || '').trim(),
+    phone_number: String(formData.get('mobile_number') || '').trim(),
+    emergency_contact: String(formData.get('emergency_contact_name') || '').trim(),
+    street_address: String(formData.get('address') || '').trim(),
+    city: String(formData.get('city') || '').trim(),
+    region: String(formData.get('province') || '').trim(),
+    emergency_contact_number: String(formData.get('emergency_contact_number') || '').trim(),
+  };
+
+  const medicalHistory = {
+    q_lactating: formData.get('q_lactating') === 'yes',
+    q_blood_test: formData.get('q_blood_test') === 'yes',
+    q_chronic: formData.get('q_chronic') === 'yes',
+    q_transfusion: formData.get('q_transfusion') === 'yes',
+    q_medications: formData.get('q_medications') === 'yes',
+    q_otc: formData.get('q_otc') === 'yes',
+    q_tobacco: formData.get('q_tobacco') === 'yes',
+    q_alcohol_drugs: formData.get('q_alcohol_drugs') === 'yes',
+    q_tattoo: formData.get('q_tattoo') === 'yes',
+  };
+
   try {
     const result = await window.supabase.createDonorProfile({
-      blood_type: 'O+',
-      status: 'active'
+      blood_type: '',
+      status: 'active',
+      personalInformation,
+      medicalHistory,
     });
 
     if (!result.success) {
