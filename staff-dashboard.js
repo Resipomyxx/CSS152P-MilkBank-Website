@@ -297,10 +297,15 @@ async function refreshInventoryMetricsAndLists() {
 function renderAllInventoryViews() {
   const rows = inventoryRowsCache;
 
-  // ----- Inventory (mL) metric — only count rows with status = 'available' -----
-  const availableRows = rows.filter((r) => String(r.status || '').toLowerCase() === 'available');
-  const totalMl = availableRows.reduce((sum, r) => sum + Number(r.volume_available || 0), 0);
-  const totalBatches = availableRows.length;
+  // "Active stock" = anything that has been screened, pasteurized, or
+  // explicitly marked available. Rows in earlier pipeline states
+  // (collected, received) and terminal states (discarded, expired) are
+  // excluded. Add more statuses to this set as the data model grows.
+  const ACTIVE_STOCK_STATUSES = new Set(['screened', 'pasteurized', 'available']);
+
+  const activeRows = rows.filter((r) => ACTIVE_STOCK_STATUSES.has(String(r.status || '').toLowerCase()));
+  const totalMl = activeRows.reduce((sum, r) => sum + Number(r.volume_available || 0), 0);
+  const totalBatches = activeRows.length;
   const inventoryCard = document.getElementById('metric-inventory-ml')
                      || document.querySelector('.metric-card[data-metric="inventory-ml"]');
   if (inventoryCard) {
@@ -310,13 +315,14 @@ function renderAllInventoryViews() {
     if (pEl) pEl.textContent = `Across ${totalBatches} batch${totalBatches === 1 ? '' : 'es'}`;
   }
 
-  // ----- Recent batches list (top 5 by created_at) -----
+  // ----- Recent batches list (top 5 by created_at) — show all rows so
+  // staff can see the full pipeline, not just active stock. -----
   renderRecentBatches(rows.slice(0, 5));
 
-  // ----- Inventory by program (top 3 by total volume_available) -----
-  renderInventoryByProgram(rows);
+  // ----- Inventory by program — only sum active stock per program. -----
+  renderInventoryByProgram(activeRows);
 
-  // ----- Expiry banner (72h) -----
+  // ----- Expiry banner (72h) — across all rows. -----
   renderExpiryBanner(rows);
 }
 
