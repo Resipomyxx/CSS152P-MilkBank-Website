@@ -75,7 +75,7 @@ async function handleRegister(event) {
 
     let redirectUrl = 'index.html';
     if (userType === 'donor') {
-      redirectUrl = 'donor-registration.html'; 
+      redirectUrl = 'donor.html';
     } else if (userType === 'staff' || userType === 'admin') {
       redirectUrl = 'staff.html';
     }
@@ -256,13 +256,11 @@ function updateNavVisibility(userType) {
     hide('a[href="staff.html"]');            // Staff Dashboard — hidden
     hide('a[href="inventory.html"]');        // Inventory — hidden
     show('a[href="donor.html"]');
-    show('a[href="donor-registration.html"]');
   } else if (userType === 'staff' || userType === 'admin') {
     hide('a[href="history.html"]');          // My Donations — hidden for staff
     show('a[href="staff.html"]');            // Staff Dashboard — staff/admin only
     show('a[href="inventory.html"]');        // Inventory — staff/admin only
     hide('a[href="donor.html"]');
-    hide('a[href="donor-registration.html"]');
   } else {
     // Guest — keep restricted links hidden (already hidden by default in HTML)
     hide('a[href="history.html"]');

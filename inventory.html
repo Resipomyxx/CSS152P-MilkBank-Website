@@ -33,7 +33,7 @@
       <div class="nav-actions">
         <a class="button button-secondary" href="#" onclick="handleLogout()" data-auth="protected" style="display: none;">Logout</a>
         <a class="button button-secondary nav-login" href="login.html" data-auth="guest">Login</a>
-        <a class="button button-accent" href="donor-registration.html" data-auth="guest">Register</a>
+        <a class="button button-accent" href="donor.html" data-auth="guest">Register</a>
       </div>
       <nav class="site-nav" id="primary-navigation">
         <a href="index.html">Home</a>
@@ -51,9 +51,10 @@
         <div class="hero-copy reveal">
           <p class="eyebrow">Stock control</p>
           <h1>Track milk volume, expiry, and batch status at a glance.</h1>
-          <p class="hero-text">The mockup’s inventory flow becomes a clear staff page here, with batch rows, expiry alerts, and program split views.</p>
+          <p class="hero-text">Use the staff inventory view to monitor available milk, watch expiry windows, and keep program allocations aligned with live donor activity.</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#table">View inventory</a>
+            <a class="button button-secondary" href="#inventory-details">Inventory details</a>
             <a class="button button-secondary" href="staff.html">Back to staff</a>
           </div>
           <ul class="hero-metrics" aria-label="Inventory highlights">
@@ -94,6 +95,29 @@
               <li>Low stock thresholds</li>
               <li>Dispensing history</li>
             </ul>
+          </div>
+          <div class="glass-card inventory-details-card" id="inventory-details">
+            <p>Floating inventory panel</p>
+            <h2>Keep the most important stock details visible while you scan the table.</h2>
+            <div class="inventory-details-grid">
+              <article>
+                <span>Live batches</span>
+                <strong>18</strong>
+              </article>
+              <article>
+                <span>Program-linked rows</span>
+                <strong>3</strong>
+              </article>
+              <article>
+                <span>Expiry alerts</span>
+                <strong>3</strong>
+              </article>
+              <article>
+                <span>Program sync</span>
+                <strong>On</strong>
+              </article>
+            </div>
+            <p class="inventory-details-copy">Program selections from donor registrations can be linked to the backend selection table, then cross-checked against available inventory before release.</p>
           </div>
         </div>
       </section>

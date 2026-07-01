@@ -135,6 +135,12 @@ async function initDonorForm() {
     return;
   }
 
+  const donorRecord = await window.supabase.getCurrentUserDonor();
+  if (profile && profile.user_type === 'donor' && donorRecord) {
+    window.location.href = 'history.html';
+    return;
+  }
+
   const emailField = document.getElementById('email');
   if (emailField && user?.email) {
     emailField.value = user.email;
@@ -614,6 +620,19 @@ async function handleDonorRegistration(event) {
 
     if (!result.success) {
       throw new Error(result.error);
+    }
+
+    const programSelection = {
+      program: String(formData.get('donation_program') || '').trim(),
+      collection_type: String(formData.get('collection_type') || '').trim(),
+      preferred_schedule: String(formData.get('preferred_schedule') || '').trim(),
+      donation_frequency: String(formData.get('donation_frequency') || '').trim(),
+      program_notes: String(formData.get('program_notes') || '').trim(),
+    };
+
+    const selectionResult = await window.supabase.saveDonorProgramSelection(programSelection);
+    if (!selectionResult.success) {
+      throw new Error(selectionResult.error);
     }
 
     clearRegistrationDraft();

@@ -988,6 +988,68 @@ a {
   gap: 1rem;
 }
 
+.inventory-details-card {
+  position: sticky;
+  top: 7.25rem;
+  display: grid;
+  gap: 1rem;
+  padding: 1.35rem;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(180deg, rgba(31, 122, 107, 0.08), rgba(255, 255, 255, 0.94));
+  border: 1px solid rgba(31, 122, 107, 0.12);
+  box-shadow: var(--shadow);
+}
+
+.inventory-details-card p {
+  margin: 0;
+  color: var(--primary-dark);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.inventory-details-card h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.inventory-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.inventory-details-grid article {
+  padding: 0.9rem 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(23, 49, 59, 0.08);
+}
+
+.inventory-details-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.inventory-details-grid strong {
+  display: block;
+  margin-top: 0.28rem;
+  font-size: 1.1rem;
+}
+
+.inventory-details-copy {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 500;
+}
+
 .glass-card,
 .info-strip article,
 .service-card,
@@ -2575,12 +2637,6 @@ flex-direction: column;
   justify-content: space-between;
   gap: 0.8rem;
   padding-top: 0.35rem;
-}
-
-.product-add {
-  min-height: 2.5rem;
-  padding-inline: 0.95rem;
-  font-size: 0.88rem;
 }
 
 .product-link {
