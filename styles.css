@@ -1871,6 +1871,10 @@ flex-direction: column;
   font-size: 1.05rem;
 }
 
+.donor-stack {
+  margin-top: 1rem;
+}
+
 .donor-form-grid-block {
   width: min(100%, 860px);
   justify-self: center;
@@ -1918,6 +1922,12 @@ flex-direction: column;
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--text);
+}
+
+.donor-step-card .donor-field > label,
+.donor-step-card .donor-medical-row > label,
+.donor-step-card .donor-field legend {
+  color: var(--text) !important;
 }
 
 .donor-field small {
@@ -2017,6 +2027,7 @@ flex-direction: column;
 .donor-medical-row {
   display: grid;
   gap: 0.35rem;
+  justify-items: start;
 }
 
 .donor-medical-row label {
@@ -2028,17 +2039,29 @@ flex-direction: column;
 }
 
 .donor-medical-select {
-  width: min(12rem, 100%);
-  min-height: 2.55rem;
-  padding: 0.55rem 0.8rem;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.92);
+  width: min(11rem, 100%);
+  min-height: 2.4rem;
+  padding: 0.45rem 2rem 0.45rem 0.8rem;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.96);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 0.85rem) 50%, calc(100% - 0.55rem) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
 }
 
 .donor-medical-select:focus {
   outline: none;
   border-color: rgba(31, 122, 107, 0.5);
   box-shadow: 0 0 0 4px rgba(31, 122, 107, 0.12);
+}
+
+.donor-medical-select:hover {
+  border-color: rgba(31, 122, 107, 0.28);
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .donor-actions {

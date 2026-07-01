@@ -43,6 +43,8 @@ function setupDonorWizard() {
   if (!wizard) return;
 
   setupPhoneValidation();
+  setupDobValidation();
+  setupPasswordValidation();
 
   wizard.addEventListener('click', (e) => {
     const button = e.target.closest('button[data-step-action]');
@@ -150,6 +152,63 @@ function setupDobValidation() {
   dobField.addEventListener('input', validateDob);
   dobField.addEventListener('change', validateDob);
   dobField.addEventListener('blur', validateDob);
+}
+
+/**
+ * Validate password strength and confirm both password fields match.
+ */
+function setupPasswordValidation() {
+  const passwordField = document.getElementById('password');
+  const confirmPasswordField = document.getElementById('confirm-password');
+  if (!passwordField || !confirmPasswordField) return;
+
+  const strengthRules = [
+    /[a-z]/,
+    /[A-Z]/,
+    /[0-9]/,
+    /[^A-Za-z0-9]/,
+  ];
+
+  const getStrength = (value) => {
+    if (!value || value.length < 8) {
+      return { level: 'weak', message: 'Password is weak. Use at least 8 characters with upper and lower case letters, a number, and a symbol.' };
+    }
+
+    const matches = strengthRules.reduce((count, rule) => count + (rule.test(value) ? 1 : 0), 0);
+
+    if (value.length >= 12 && matches === 4) {
+      return { level: 'strong', message: 'Password strength: strong.' };
+    }
+
+    if (matches >= 3) {
+      return { level: 'moderate', message: 'Password strength: moderate. Add one more character type to make it stronger.' };
+    }
+
+    return { level: 'weak', message: 'Password is weak. Use upper and lower case letters, a number, and a symbol.' };
+  };
+
+  const validatePasswords = () => {
+    const strength = getStrength(passwordField.value);
+
+    if (strength.level === 'weak') {
+      passwordField.setCustomValidity(strength.message);
+    } else if (strength.level === 'moderate') {
+      passwordField.setCustomValidity(strength.message);
+    } else {
+      passwordField.setCustomValidity('');
+    }
+
+    if (confirmPasswordField.value && passwordField.value !== confirmPasswordField.value) {
+      confirmPasswordField.setCustomValidity('Passwords do not match.');
+    } else {
+      confirmPasswordField.setCustomValidity('');
+    }
+  };
+
+  passwordField.addEventListener('input', validatePasswords);
+  passwordField.addEventListener('blur', validatePasswords);
+  confirmPasswordField.addEventListener('input', validatePasswords);
+  confirmPasswordField.addEventListener('blur', validatePasswords);
 }
 
 /**
