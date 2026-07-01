@@ -219,32 +219,31 @@ async function updateAuthUI() {
 }
 
 /**
- * Update navigation visibility based on user type
+ * Update navigation visibility based on user type.
+ * Role-restricted links start hidden in HTML; this function reveals the right ones.
  * Roles: guest, donor, staff, admin
  */
 function updateNavVisibility(userType) {
-  // Get all nav links
-  const allNavLinks = document.querySelectorAll('.site-nav a');
-  const donorLinks = document.querySelectorAll('a[href="donor.html"], a[href="donor-registration.html"], a[href="history.html"]');
-  const staffLinks = document.querySelectorAll('a[href="staff.html"], a[href="inventory.html"]');
-  const publicLinks = document.querySelectorAll('a[href="index.html"], a[href="about.html"], a[href="products.html"]');
-  const guestLinks = document.querySelectorAll('a[href="login.html"], a[href="register.html"]');
-
-  // Reset display
-  allNavLinks.forEach(link => link.style.display = 'inline-block');
+  const show = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = 'inline-block');
+  const hide = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
 
   if (userType === 'donor') {
-    staffLinks.forEach(link => link.style.display = 'none');
-    guestLinks.forEach(link => link.style.display = 'none');
+    show('a[href="history.html"]');         // My Donations — donors only
+    hide('a[href="staff.html"]');            // Staff Dashboard — hidden
+    hide('a[href="inventory.html"]');        // Inventory — hidden
+    show('a[href="donor.html"]');
+    show('a[href="donor-registration.html"]');
   } else if (userType === 'staff' || userType === 'admin') {
-    donorLinks.forEach(link => link.style.display = 'none');
-    guestLinks.forEach(link => link.style.display = 'none');
-    // Staff/Admin can see public links too
+    hide('a[href="history.html"]');          // My Donations — hidden for staff
+    show('a[href="staff.html"]');            // Staff Dashboard — staff/admin only
+    show('a[href="inventory.html"]');        // Inventory — staff/admin only
+    hide('a[href="donor.html"]');
+    hide('a[href="donor-registration.html"]');
   } else {
-    // Guest
-    document.querySelectorAll('a[href="history.html"]').forEach(link => link.style.display = 'none');
-    staffLinks.forEach(link => link.style.display = 'none');
-    // Guests can see public links and login/register
+    // Guest — keep restricted links hidden (already hidden by default in HTML)
+    hide('a[href="history.html"]');
+    hide('a[href="staff.html"]');
+    hide('a[href="inventory.html"]');
   }
 }
 

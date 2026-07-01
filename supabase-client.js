@@ -164,27 +164,93 @@ async function updateUserProfile(updates) {
 
 /**
  * Create a new donor profile
- * @param {object} donorData - blood_type, status, etc
- * @returns {Promise<object>} Created donor or error
+ * @param {object} donorData - blood_type, status, personalInformation, medicalHistory
+ * @returns {Promise<object>} Created donor data or error
  */
 async function createDonorProfile(donorData) {
   try {
     const user = await getCurrentUser();
     if (!user) throw new Error('No user logged in');
 
+    const profileId = user.id;
+    const personalInformation = donorData.personalInformation || {};
+    const medicalHistory = donorData.medicalHistory || {};
+
+    const { data: profileData, error: profileError } = await supabaseClient
+      .from('profiles')
+      .upsert([{
+        id: profileId,
+        email: personalInformation.email || user.email || '',
+        full_name: [personalInformation.first_name, personalInformation.last_name]
+          .filter(Boolean)
+          .join(' ')
+          .trim(),
+        phone: personalInformation.phone_number || personalInformation.mobile_number || '',
+        user_type: 'donor'
+      }], { onConflict: 'id' })
+      .select()
+      .single();
+
+    if (profileError) throw profileError;
+
+    const { data: personalInformationData, error: personalInformationError } = await supabaseClient
+      .from('personal_information')
+      .upsert([{
+        profile_id: profileId,
+        first_name: personalInformation.first_name || '',
+        last_name: personalInformation.last_name || '',
+        birthdate: personalInformation.birthdate || personalInformation.date_of_birth || null,
+        email: personalInformation.email || user.email || '',
+        phone_number: personalInformation.phone_number || personalInformation.mobile_number || '',
+        emergency_contact: personalInformation.emergency_contact || personalInformation.emergency_contact_name || '',
+        street_address: personalInformation.street_address || personalInformation.address || '',
+        city: personalInformation.city || '',
+        region: personalInformation.region || personalInformation.province || '',
+        emergency_contact_number: personalInformation.emergency_contact_number || ''
+      }], { onConflict: 'profile_id' })
+      .select()
+      .single();
+
+    if (personalInformationError) throw personalInformationError;
+
+    const { data: medicalHistoryData, error: medicalHistoryError } = await supabaseClient
+      .from('medical_history')
+      .upsert([{
+        profile_id: profileId,
+        lactating_excess: Boolean(medicalHistory.q_lactating),
+        willing_for_mandatory_blood_test: Boolean(medicalHistory.q_blood_test),
+        history_chronic_conditions: Boolean(medicalHistory.q_chronic),
+        had_blood_transfusion_or_surgery: Boolean(medicalHistory.q_transfusion),
+        taking_medications_or_supplements: Boolean(medicalHistory.q_medications),
+        regularly_taking_otc_or_herbal_remedies: Boolean(medicalHistory.q_otc),
+        uses_tobacco_or_vaping: Boolean(medicalHistory.q_tobacco),
+        consumes_alcohol_or_drugs: Boolean(medicalHistory.q_alcohol_drugs),
+        has_tattoo_or_piercing: Boolean(medicalHistory.q_tattoo)
+      }], { onConflict: 'profile_id' })
+      .select()
+      .single();
+
+    if (medicalHistoryError) throw medicalHistoryError;
+
     const { data, error } = await supabaseClient
       .from('donors')
-      .insert([{
+      .upsert([{
         user_id: user.id,
         blood_type: donorData.blood_type || '',
         status: donorData.status || 'active',
         donation_count: 0
-      }])
+      }], { onConflict: 'user_id' })
       .select()
       .single();
 
     if (error) throw error;
-    return { success: true, donor: data };
+    return {
+      success: true,
+      profile: profileData,
+      personalInformation: personalInformationData,
+      medicalHistory: medicalHistoryData,
+      donor: data
+    };
   } catch (error) {
     console.error('Create donor profile error:', error);
     return { success: false, error: error.message };

@@ -1877,6 +1877,10 @@ flex-direction: column;
   font-size: 1.05rem;
 }
 
+.donor-stack {
+  margin-top: 1rem;
+}
+
 .donor-form-grid-block {
   width: min(100%, 860px);
   justify-self: center;
@@ -1923,6 +1927,13 @@ flex-direction: column;
   margin-bottom: 0.35rem;
   font-size: 0.88rem;
   font-weight: 700;
+  color: var(--text);
+}
+
+.donor-step-card .donor-field > label,
+.donor-step-card .donor-medical-row > label,
+.donor-step-card .donor-field legend {
+  color: var(--text) !important;
 }
 
 .donor-field small {
@@ -2019,54 +2030,44 @@ flex-direction: column;
   background: #f59e0b;
 }
 
-/* Yes / No radio question groups in Medical History */
-.donor-yn-group {
-  border: none;
-  padding: 0;
-  margin: 0;
+.donor-medical-row {
+  display: grid;
+  gap: 0.35rem;
+  justify-items: start;
 }
 
-.donor-yn-group legend {
-  display: block;
-  font-size: 0.9rem;
+.donor-medical-row label {
+  margin: 0;
+  font-size: 0.88rem;
   font-weight: 700;
   color: var(--text);
-  line-height: 1.5;
-  margin-bottom: 0.65rem;
-  padding: 0;
+  line-height: 1.45;
 }
 
-.donor-yn-options {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.donor-yn-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
+.donor-medical-select {
+  width: min(11rem, 100%);
+  min-height: 2.4rem;
+  padding: 0.45rem 2rem 0.45rem 0.8rem;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.96);
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 0.85rem) 50%, calc(100% - 0.55rem) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  appearance: none;
+  -webkit-appearance: none;
   cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  padding: 0.4rem 1.2rem;
-  border: 1.5px solid var(--border, #d1d5db);
-  border-radius: 8px;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
-  user-select: none;
 }
 
-.donor-yn-label:has(input:checked) {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary);
+.donor-medical-select:focus {
+  outline: none;
+  border-color: rgba(31, 122, 107, 0.5);
+  box-shadow: 0 0 0 4px rgba(31, 122, 107, 0.12);
 }
 
-.donor-yn-label input[type="radio"] {
-  width: 15px;
-  height: 15px;
-  accent-color: var(--primary);
-  flex-shrink: 0;
+.donor-medical-select:hover {
+  border-color: rgba(31, 122, 107, 0.28);
+  background-color: rgba(255, 255, 255, 1);
 }
 
 .donor-actions {

@@ -43,6 +43,8 @@ function setupDonorWizard() {
   if (!wizard) return;
 
   setupPhoneValidation();
+  setupDobValidation();
+  setupPasswordValidation();
 
   wizard.addEventListener('click', (e) => {
     const button = e.target.closest('button[data-step-action]');
@@ -90,22 +92,123 @@ function setupDonorWizard() {
  * Strip non-digits and enforce 11-digit cap on the mobile number field
  */
 function setupPhoneValidation() {
-  const phoneField = document.getElementById('phone');
-  if (!phoneField) return;
-  phoneField.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
-  });
-  phoneField.addEventListener('blur', () => {
-    const val = phoneField.value;
-    if (val && val.length !== 11) {
-      phoneField.setCustomValidity('Mobile number must be exactly 11 digits.');
-    } else {
+  const phoneFields = [document.getElementById('phone'), document.getElementById('emergency-phone')].filter(Boolean);
+  const sanitizeDigits = (field) => {
+    field.value = field.value.replace(/\D/g, '').slice(0, 11);
+  };
+
+  phoneFields.forEach((phoneField) => {
+    phoneField.addEventListener('input', () => {
+      sanitizeDigits(phoneField);
       phoneField.setCustomValidity('');
+    });
+
+    phoneField.addEventListener('blur', () => {
+      sanitizeDigits(phoneField);
+      const val = phoneField.value;
+
+      if (val && val.length !== 11) {
+        phoneField.setCustomValidity('Mobile number must be exactly 11 digits.');
+      } else {
+        phoneField.setCustomValidity('');
+      }
+    });
+  });
+}
+
+/**
+ * Validate the date of birth field so only real past dates are accepted.
+ */
+function setupDobValidation() {
+  const dobField = document.getElementById('dob');
+  if (!dobField) return;
+
+  const minDate = '1900-01-01';
+  const today = new Date().toISOString().slice(0, 10);
+  dobField.min = minDate;
+  dobField.max = today;
+
+  const validateDob = () => {
+    const value = dobField.value;
+
+    if (!value) {
+      dobField.setCustomValidity('');
+      return;
     }
-  });
-  phoneField.addEventListener('input', () => {
-    phoneField.setCustomValidity('');
-  });
+
+    if (value < minDate) {
+      dobField.setCustomValidity('Please enter a valid date of birth after 1900.');
+      return;
+    }
+
+    if (value > today) {
+      dobField.setCustomValidity('Date of birth cannot be in the future.');
+      return;
+    }
+
+    dobField.setCustomValidity('');
+  };
+
+  dobField.addEventListener('input', validateDob);
+  dobField.addEventListener('change', validateDob);
+  dobField.addEventListener('blur', validateDob);
+}
+
+/**
+ * Validate password strength and confirm both password fields match.
+ */
+function setupPasswordValidation() {
+  const passwordField = document.getElementById('password');
+  const confirmPasswordField = document.getElementById('confirm-password');
+  if (!passwordField || !confirmPasswordField) return;
+
+  const strengthRules = [
+    /[a-z]/,
+    /[A-Z]/,
+    /[0-9]/,
+    /[^A-Za-z0-9]/,
+  ];
+
+  const getStrength = (value) => {
+    if (!value || value.length < 8) {
+      return { level: 'weak', message: 'Password is weak. Use at least 8 characters with upper and lower case letters, a number, and a symbol.' };
+    }
+
+    const matches = strengthRules.reduce((count, rule) => count + (rule.test(value) ? 1 : 0), 0);
+
+    if (value.length >= 12 && matches === 4) {
+      return { level: 'strong', message: 'Password strength: strong.' };
+    }
+
+    if (matches >= 3) {
+      return { level: 'moderate', message: 'Password strength: moderate. Add one more character type to make it stronger.' };
+    }
+
+    return { level: 'weak', message: 'Password is weak. Use upper and lower case letters, a number, and a symbol.' };
+  };
+
+  const validatePasswords = () => {
+    const strength = getStrength(passwordField.value);
+
+    if (strength.level === 'weak') {
+      passwordField.setCustomValidity(strength.message);
+    } else if (strength.level === 'moderate') {
+      passwordField.setCustomValidity(strength.message);
+    } else {
+      passwordField.setCustomValidity('');
+    }
+
+    if (confirmPasswordField.value && passwordField.value !== confirmPasswordField.value) {
+      confirmPasswordField.setCustomValidity('Passwords do not match.');
+    } else {
+      confirmPasswordField.setCustomValidity('');
+    }
+  };
+
+  passwordField.addEventListener('input', validatePasswords);
+  passwordField.addEventListener('blur', validatePasswords);
+  confirmPasswordField.addEventListener('input', validatePasswords);
+  confirmPasswordField.addEventListener('blur', validatePasswords);
 }
 
 /**
@@ -258,7 +361,7 @@ function populateEligibilityReview() {
 
   list.innerHTML = '';
   checks.forEach((check) => {
-    const answered = wizard.querySelector(`input[name="${check.name}"]:checked`);
+    const answered = wizard.querySelector(`select[name="${check.name}"]`);
     const li = document.createElement('li');
     if (answered && answered.value === 'yes') {
       li.className = check.yesClass;
@@ -274,6 +377,27 @@ function populateEligibilityReview() {
   });
 }
 
+const PROGRAM_DESCRIPTIONS = {
+  'Supsup Todo': 'Best for mothers with a large daily surplus — ideal if you regularly produce more than 500 mL beyond your baby\'s needs.',
+  'Milky Way': 'For consistent donors who can commit to weekly or bi-weekly drop-offs of at least 100 mL per session.',
+  "Mom's Act": 'No commitment required — donate whenever you have milk to spare. Great for first-time or occasional donors.',
+};
+
+/**
+ * Show a compact description below the program select when a program is chosen
+ */
+function showProgramDescription(value) {
+  const descEl = document.getElementById('program-description');
+  if (!descEl) return;
+  const desc = PROGRAM_DESCRIPTIONS[value];
+  if (desc) {
+    descEl.textContent = desc;
+    descEl.style.display = 'block';
+  } else {
+    descEl.style.display = 'none';
+  }
+}
+
 /**
  * Handle final form submission - creates donor profile in database
  */
@@ -285,9 +409,15 @@ async function handleDonorRegistration(event) {
   const activeStep = wizard.querySelector('.donor-step.is-active');
   const stepIndex = steps.indexOf(activeStep);
   const totalSteps = steps.length;
+  const user = await window.supabase.getCurrentUser();
 
   if (stepIndex < totalSteps - 1) {
     nextStep();
+    return;
+  }
+
+  if (!user) {
+    window.location.href = 'login.html';
     return;
   }
 
@@ -314,10 +444,38 @@ async function handleDonorRegistration(event) {
     submitBtn.textContent = 'Completing registration...';
   }
 
+  const formData = new FormData(form);
+  const personalInformation = {
+    first_name: String(formData.get('first_name') || '').trim(),
+    last_name: String(formData.get('last_name') || '').trim(),
+    birthdate: String(formData.get('date_of_birth') || '').trim(),
+    email: String(formData.get('email') || user.email || '').trim(),
+    phone_number: String(formData.get('mobile_number') || '').trim(),
+    emergency_contact: String(formData.get('emergency_contact_name') || '').trim(),
+    street_address: String(formData.get('address') || '').trim(),
+    city: String(formData.get('city') || '').trim(),
+    region: String(formData.get('province') || '').trim(),
+    emergency_contact_number: String(formData.get('emergency_contact_number') || '').trim(),
+  };
+
+  const medicalHistory = {
+    q_lactating: formData.get('q_lactating') === 'yes',
+    q_blood_test: formData.get('q_blood_test') === 'yes',
+    q_chronic: formData.get('q_chronic') === 'yes',
+    q_transfusion: formData.get('q_transfusion') === 'yes',
+    q_medications: formData.get('q_medications') === 'yes',
+    q_otc: formData.get('q_otc') === 'yes',
+    q_tobacco: formData.get('q_tobacco') === 'yes',
+    q_alcohol_drugs: formData.get('q_alcohol_drugs') === 'yes',
+    q_tattoo: formData.get('q_tattoo') === 'yes',
+  };
+
   try {
     const result = await window.supabase.createDonorProfile({
-      blood_type: 'O+',
-      status: 'active'
+      blood_type: '',
+      status: 'active',
+      personalInformation,
+      medicalHistory,
     });
 
     if (!result.success) {

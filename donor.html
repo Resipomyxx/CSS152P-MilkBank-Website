@@ -39,9 +39,9 @@
         <a href="index.html">Home</a>
         <a href="about.html">About Us</a>
         <a href="donor.html">Donor Registration</a>
-        <a href="history.html">My Donations</a>
-        <a href="staff.html">Staff Dashboard</a>
-        <a href="inventory.html">Inventory</a>
+        <a href="history.html" style="display:none;">My Donations</a>
+        <a href="staff.html" style="display:none;">Staff Dashboard</a>
+        <a href="inventory.html" style="display:none;">Inventory</a>
         <a href="products.html">Products</a>
       </nav>
     </header>
@@ -51,14 +51,16 @@
           <div class="donor-section-head">
             <div>
               <p class="eyebrow">Registration flow</p>
-              <h2>Complete the donor profile, medical screening, and account setup in one flow.</h2>
-              <p class="donor-section-subtitle">All fields are in place for backend wiring later, but this page remains frontend-only.</p>
-                      <div class="donor-stack">
+              <h2>Complete your donor profile and medical screening in one simple flow.</h2>
+            </div>
+          </div>
+
+          <div class="donor-stack">
             <form class="form-card donor-wizard" data-donor-wizard novalidate onsubmit="handleDonorRegistration(event)">
               <div class="donor-wizard-header">
                 <div>
                   <p class="eyebrow">Step <span data-step-label>1</span> of <span data-step-total>4</span></p>
-                  <h3 data-step-title>Donor Consent & Guidelines</h3>
+                  <h3 data-step-title>Personal Information</h3>
                 </div>
               </div>
 
@@ -77,15 +79,25 @@
                       </div>
                       <div class="donor-field">
                         <label for="dob">Date of birth</label>
-                        <input id="dob" name="date_of_birth" type="date" required />
+                        <input id="dob" name="date_of_birth" type="date" min="1900-01-01" max="2026-07-01" required aria-describedby="dob-hint" />
+                        <small id="dob-hint">Select a valid date of birth that is not in the future.</small>
                       </div>
                       <div class="donor-field">
                         <label for="email">Email address</label>
                         <input id="email" name="email" type="email" placeholder="name@example.com" required />
                       </div>
                       <div class="donor-field">
+                        <label for="password">Create password</label>
+                        <input id="password" name="password" type="password" placeholder="Create a password" required aria-describedby="password-hint" />
+                        <small id="password-hint">Use at least 8 characters with upper and lower case letters, a number, and a symbol.</small>
+                      </div>
+                      <div class="donor-field">
+                        <label for="confirm-password">Re-enter password</label>
+                        <input id="confirm-password" name="confirm_password" type="password" placeholder="Re-enter your password" required />
+                      </div>
+                      <div class="donor-field">
                         <label for="phone">Mobile number</label>
-                        <input id="phone" name="mobile_number" type="tel" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" required aria-describedby="phone-hint" />
+                        <input id="phone" name="mobile_number" type="text" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" autocomplete="tel" required aria-describedby="phone-hint" />
                         <small id="phone-hint">Enter your 11-digit Philippine mobile number (e.g. 09171234567).</small>
                       </div>
                       <div class="donor-field">
@@ -116,102 +128,93 @@
                       </div>
                       <div class="donor-field">
                         <label for="emergency-phone">Emergency contact number</label>
-                        <input id="emergency-phone" name="emergency_contact_number" type="tel" placeholder="09xx xxx xxxx" required />
+                        <input id="emergency-phone" name="emergency_contact_number" type="text" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" autocomplete="tel" required aria-describedby="emergency-phone-hint" />
+                        <small id="emergency-phone-hint">Use digits only and enter 11 numbers.</small>
                       </div>
                     </div>
                   </section>
 
                   <section class="donor-step-card donor-step" data-step-title="Medical History" data-step-note="Answer all screening questions honestly before continuing.">
                     <div class="donor-form-grid donor-form-grid-block">
-
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>1. Are you currently lactating and producing breast milk in excess of your own baby's needs?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_lactating" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_lactating" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_lactating">1. Are you currently lactating and producing breast milk in excess of your own baby's needs?</label>
+                        <select id="q_lactating" name="q_lactating" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>2. Are you willing to undergo a free, mandatory blood test to screen for infectious diseases?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_blood_test" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_blood_test" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_blood_test">2. Are you willing to undergo a free, mandatory blood test to screen for infectious diseases?</label>
+                        <select id="q_blood_test" name="q_blood_test" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>3. Do you have a history of chronic medical conditions, such as cancer or autoimmune diseases?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_chronic" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_chronic" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_chronic">3. Do you have a history of chronic medical conditions, such as cancer or autoimmune diseases?</label>
+                        <select id="q_chronic" name="q_chronic" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>4. Have you ever received a blood transfusion, a blood product, or undergone a medical surgery in the past 12 months?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_transfusion" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_transfusion" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_transfusion">4. Have you ever received a blood transfusion, a blood product, or undergone a medical surgery in the past 12 months?</label>
+                        <select id="q_transfusion" name="q_transfusion" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>5. Are you currently taking any medications, weight-loss supplements, or herbal remedies (excluding prenatal vitamins, insulin, or thyroid medications)?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_medications" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_medications" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_medications">5. Are you currently taking any medications, weight-loss supplements, or herbal remedies (excluding prenatal vitamins, insulin, or thyroid medications)?</label>
+                        <select id="q_medications" name="q_medications" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>6. Do you regularly take over-the-counter medications, weight-loss supplements, or herbal remedies (such as fenugreek or milk thistle)?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_otc" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_otc" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_otc">6. Do you regularly take over-the-counter medications, weight-loss supplements, or herbal remedies (such as fenugreek or milk thistle)?</label>
+                        <select id="q_otc" name="q_otc" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>7. Do you use any tobacco products, e-cigarettes, vapes, or nicotine replacement therapies (patches/gum)?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_tobacco" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_tobacco" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_tobacco">7. Do you use any tobacco products, e-cigarettes, vapes, or nicotine replacement therapies (patches/gum)?</label>
+                        <select id="q_tobacco" name="q_tobacco" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>8. Do you routinely consume alcohol, or used recreational/illicit drugs?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_alcohol_drugs" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_alcohol_drugs" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_alcohol_drugs">8. Do you routinely consume alcohol, or used recreational/illicit drugs?</label>
+                        <select id="q_alcohol_drugs" name="q_alcohol_drugs" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
-                      <div class="donor-field donor-field-full">
-                        <fieldset class="donor-yn-group">
-                          <legend>9. Have you gotten a tattoo, permanent makeup, or a body piercing in the past 12 months?</legend>
-                          <div class="donor-yn-options">
-                            <label class="donor-yn-label"><input type="radio" name="q_tattoo" value="yes" required /><span>Yes</span></label>
-                            <label class="donor-yn-label"><input type="radio" name="q_tattoo" value="no" /><span>No</span></label>
-                          </div>
-                        </fieldset>
+                      <div class="donor-field donor-field-full donor-medical-row">
+                        <label for="q_tattoo">9. Have you gotten a tattoo, permanent makeup, or a body piercing in the past 12 months?</label>
+                        <select id="q_tattoo" name="q_tattoo" class="donor-medical-select" required>
+                          <option value="">Select one</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
                       </div>
 
                     </div>
@@ -221,25 +224,27 @@
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
                         <label for="program">Donation program</label>
-                        <select id="program" name="donation_program" required>
-                          <option value="">Select program</option>
-                          <option>Supsup Todo</option>
-                          <option>Milky Way</option>
-                          <option>Mom's Act</option>
+                        <select id="program" name="donation_program" required onchange="showProgramDescription(this.value)">
+                          <option value="">Select a program</option>
+                          <option value="Supsup Todo">Supsup Todo</option>
+                          <option value="Milky Way">Milky Way</option>
+                          <option value="Mom's Act">Mom's Act</option>
                         </select>
+                        <div id="program-description" class="helper-text program-desc" style="display:none; margin-top:0.45rem;"></div>
                       </div>
                       <div class="donor-field">
                         <label for="collection-type">Collection type</label>
                         <select id="collection-type" name="collection_type" required>
-                          <option value="">Select one</option>
-                          <option>Drop-off</option>
-                          <option>Pick-up</option>
-                          <option>Home collection</option>
+                          <option value="">Select method</option>
+                          <option value="Drop-off">Drop-off — bring milk to our facility</option>
+                          <option value="Pick-up">Pick-up — we collect from a nearby point</option>
+                          <option value="Home collection">Home collection — courier picks up at your home</option>
                         </select>
                       </div>
                       <div class="donor-field">
                         <label for="schedule">Preferred time</label>
                         <input id="schedule" name="preferred_schedule" type="time" required />
+                        <small>Select the time of day that works best for your donation.</small>
                       </div>
                       <div class="donor-field">
                         <label for="frequency">Donation frequency</label>
