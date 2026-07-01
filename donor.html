@@ -57,7 +57,7 @@
             <form class="form-card donor-wizard" data-donor-wizard novalidate onsubmit="handleDonorRegistration(event)">
               <div class="donor-wizard-header">
                 <div>
-                  <p class="eyebrow">Step <span data-step-label>1</span> of <span data-step-total>6</span></p>
+                  <p class="eyebrow">Step <span data-step-label>1</span> of <span data-step-total>4</span></p>
                   <h3 data-step-title>Donor Consent & Guidelines</h3>
                 </div>
               </div>
@@ -65,19 +65,28 @@
               <div class="donor-wizard-viewport">
                 <div class="donor-wizard-track">
 
-                  <section class="donor-step-card donor-step is-active" data-step-title="Account Setup" data-step-note="Finish the account details and accept the terms to complete registration.">
+                  <section class="donor-step-card donor-step is-active" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
                     <div class="donor-form-grid donor-form-grid-block">
                       <div class="donor-field">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" type="text" placeholder="Choose a username" required />
+                        <label for="first-name">First name</label>
+                        <input id="first-name" name="first_name" type="text" placeholder="Maria" required />
                       </div>
                       <div class="donor-field">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" placeholder="Create a password" required />
+                        <label for="last-name">Last name</label>
+                        <input id="last-name" name="last_name" type="text" placeholder="Santos" required />
                       </div>
                       <div class="donor-field">
-                        <label for="confirm-password">Confirm password</label>
-                        <input id="confirm-password" name="confirm_password" type="password" placeholder="Re-enter password" required />
+                        <label for="dob">Date of birth</label>
+                        <input id="dob" name="date_of_birth" type="date" required />
+                      </div>
+                      <div class="donor-field">
+                        <label for="email">Email address</label>
+                        <input id="email" name="email" type="email" placeholder="name@example.com" required />
+                      </div>
+                      <div class="donor-field">
+                        <label for="phone">Mobile number</label>
+                        <input id="phone" name="mobile_number" type="tel" placeholder="09XXXXXXXXX" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" required aria-describedby="phone-hint" />
+                        <small id="phone-hint">Enter your 11-digit Philippine mobile number (e.g. 09171234567).</small>
                       </div>
                       <div class="donor-field">
                         <label for="preferred-contact">Preferred contact method</label>
@@ -88,47 +97,6 @@
                           <option>SMS</option>
                         </select>
                         <div id="preferred-contact-help" class="helper-text">Choose how LactoCare should contact you for screening and scheduling (Email, Phone, or SMS).</div>
-                      </div>
-                      <div class="donor-field donor-field-full">
-                        <label class="consent-accept donor-accept-row">
-                          <input type="checkbox" name="terms_acknowledged" required />
-                          <span>I agree to the registration terms and understand that my information will be reviewed before activation.</span>
-                        </label>
-                        <p class="helper-text" style="margin-top:0.5rem;">Click here to read the full <a href="#" class="eula-link">EULA</a>.</p>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section class="donor-step-card donor-step" data-step-title="Personal Information" data-step-note="Fields on this slide must be complete before you can continue.">
-                    <div class="donor-form-grid donor-form-grid-block">
-                      <div class="donor-field">
-                        <label for="full-name">Full name</label>
-                        <input id="full-name" name="full_name" type="text" placeholder="Maria Santos" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="preferred-name">Preferred name</label>
-                        <input id="preferred-name" name="preferred_name" type="text" placeholder="Maria" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="dob">Date of birth</label>
-                        <input id="dob" name="date_of_birth" type="date" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="sex">Sex</label>
-                        <select id="sex" name="sex" required>
-                          <option value="">Select sex</option>
-                          <option>Female</option>
-                          <option>Male</option>
-                          <option>Prefer not to say</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="email">Email address</label>
-                        <input id="email" name="email" type="email" placeholder="name@example.com" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="phone">Mobile number</label>
-                        <input id="phone" name="mobile_number" type="tel" placeholder="09xx xxx xxxx" required />
                       </div>
                       <div class="donor-field donor-field-full">
                         <label for="address">Home address</label>
@@ -153,68 +121,99 @@
                     </div>
                   </section>
 
-                  <section class="donor-step-card donor-step" data-step-title="Medical History" data-step-note="Every medical field here is required before the next slide unlocks.">
+                  <section class="donor-step-card donor-step" data-step-title="Medical History" data-step-note="Answer all screening questions honestly before continuing.">
                     <div class="donor-form-grid donor-form-grid-block">
-                      <div class="donor-field">
-                        <label for="infant-age">Current age of infant</label>
-                        <input id="infant-age" name="infant_age" type="text" placeholder="e.g. 3 months" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="breastfeeding">Are you currently breastfeeding?</label>
-                        <select id="breastfeeding" name="breastfeeding_status" required>
-                          <option value="">Select one</option>
-                          <option>Yes, exclusively</option>
-                          <option>Yes, partially</option>
-                          <option>No</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="medications">Any prescribed medications?</label>
-                        <select id="medications" name="prescribed_medications" required>
-                          <option value="">Select one</option>
-                          <option>No</option>
-                          <option>Yes</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="hiv-status">HIV / Hepatitis B / C status</label>
-                        <select id="hiv-status" name="infectious_status" required>
-                          <option value="">Select one</option>
-                          <option>Negative (tested)</option>
-                          <option>Pending confirmation</option>
-                          <option>Requires review</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="smoking">Smoking / tobacco use</label>
-                        <select id="smoking" name="smoking_status" required>
-                          <option value="">Select one</option>
-                          <option>Non-smoker</option>
-                          <option>Occasional</option>
-                          <option>Regular use</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="alcohol">Alcohol consumption</label>
-                        <select id="alcohol" name="alcohol_use" required>
-                          <option value="">Select one</option>
-                          <option>None</option>
-                          <option>Occasional</option>
-                          <option>Regular</option>
-                        </select>
-                      </div>
-                      <div class="donor-field">
-                        <label for="allergies">Known allergies</label>
-                        <input id="allergies" name="allergies" type="text" placeholder="List allergies or none" required />
-                      </div>
-                      <div class="donor-field">
-                        <label for="recent-illness">Recent illness or surgery</label>
-                        <input id="recent-illness" name="recent_illness" type="text" placeholder="Describe or leave blank if none" required />
-                      </div>
+
                       <div class="donor-field donor-field-full">
-                        <label for="additional-history">Additional medical notes</label>
-                        <textarea id="additional-history" name="additional_medical_notes" placeholder="Add any relevant screening notes, medications, or recent treatments." required></textarea>
+                        <fieldset class="donor-yn-group">
+                          <legend>1. Are you currently lactating and producing breast milk in excess of your own baby's needs?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_lactating" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_lactating" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
                       </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>2. Are you willing to undergo a free, mandatory blood test to screen for infectious diseases?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_blood_test" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_blood_test" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>3. Do you have a history of chronic medical conditions, such as cancer or autoimmune diseases?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_chronic" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_chronic" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>4. Have you ever received a blood transfusion, a blood product, or undergone a medical surgery in the past 12 months?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_transfusion" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_transfusion" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>5. Are you currently taking any medications, weight-loss supplements, or herbal remedies (excluding prenatal vitamins, insulin, or thyroid medications)?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_medications" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_medications" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>6. Do you regularly take over-the-counter medications, weight-loss supplements, or herbal remedies (such as fenugreek or milk thistle)?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_otc" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_otc" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>7. Do you use any tobacco products, e-cigarettes, vapes, or nicotine replacement therapies (patches/gum)?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_tobacco" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_tobacco" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>8. Do you routinely consume alcohol, or used recreational/illicit drugs?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_alcohol_drugs" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_alcohol_drugs" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
+                      <div class="donor-field donor-field-full">
+                        <fieldset class="donor-yn-group">
+                          <legend>9. Have you gotten a tattoo, permanent makeup, or a body piercing in the past 12 months?</legend>
+                          <div class="donor-yn-options">
+                            <label class="donor-yn-label"><input type="radio" name="q_tattoo" value="yes" required /><span>Yes</span></label>
+                            <label class="donor-yn-label"><input type="radio" name="q_tattoo" value="no" /><span>No</span></label>
+                          </div>
+                        </fieldset>
+                      </div>
+
                     </div>
                   </section>
 
@@ -239,8 +238,8 @@
                         </select>
                       </div>
                       <div class="donor-field">
-                        <label for="schedule">Preferred schedule</label>
-                        <input id="schedule" name="preferred_schedule" type="text" placeholder="e.g. Weekdays, 9:00 AM - 12:00 PM" required />
+                        <label for="schedule">Preferred time</label>
+                        <input id="schedule" name="preferred_schedule" type="time" required />
                       </div>
                       <div class="donor-field">
                         <label for="frequency">Donation frequency</label>
@@ -259,14 +258,11 @@
                     </div>
                   </section>
 
-                  <section class="donor-step-card donor-step" data-step-title="Eligibility Review" data-step-note="Review the checks carefully and confirm both acknowledgements to unlock the final slide.">
+                  <section class="donor-step-card donor-step" data-step-title="Eligibility Review" data-step-note="Review the checks carefully and confirm all acknowledgements to complete registration.">
                     <div class="donor-check-panel">
                       <h3>Preliminary eligibility check</h3>
-                      <ul class="donor-check-list">
-                        <li>Infant under 12 months - eligible</li>
-                        <li>Non-smoker - eligible</li>
-                        <li>No reported communicable disease - eligible</li>
-                        <li>HIV/Hepatitis status: awaiting lab confirmation</li>
+                      <ul class="donor-check-list" data-eligibility-list>
+                        <li class="is-review">Complete the Medical History step to see your eligibility status here.</li>
                       </ul>
                     </div>
                     <div class="donor-confirm-grid">
@@ -278,6 +274,11 @@
                         <input type="checkbox" name="information_accuracy" required />
                         <span>I confirm that the information provided is accurate to the best of my knowledge.</span>
                       </label>
+                      <label class="consent-accept donor-accept-row">
+                        <input type="checkbox" name="terms_acknowledged" required />
+                        <span>I agree to the registration terms and understand that my information will be reviewed before activation.</span>
+                      </label>
+                      <p class="helper-text" style="margin-top:0.25rem;">Click here to read the full <a href="#" class="eula-link">EULA</a>.</p>
                     </div>
                   </section>
 
