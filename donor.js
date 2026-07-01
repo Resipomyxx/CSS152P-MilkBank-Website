@@ -90,22 +90,66 @@ function setupDonorWizard() {
  * Strip non-digits and enforce 11-digit cap on the mobile number field
  */
 function setupPhoneValidation() {
-  const phoneField = document.getElementById('phone');
-  if (!phoneField) return;
-  phoneField.addEventListener('input', (e) => {
-    e.target.value = e.target.value.replace(/\D/g, '').slice(0, 11);
-  });
-  phoneField.addEventListener('blur', () => {
-    const val = phoneField.value;
-    if (val && val.length !== 11) {
-      phoneField.setCustomValidity('Mobile number must be exactly 11 digits.');
-    } else {
+  const phoneFields = [document.getElementById('phone'), document.getElementById('emergency-phone')].filter(Boolean);
+  const sanitizeDigits = (field) => {
+    field.value = field.value.replace(/\D/g, '').slice(0, 11);
+  };
+
+  phoneFields.forEach((phoneField) => {
+    phoneField.addEventListener('input', () => {
+      sanitizeDigits(phoneField);
       phoneField.setCustomValidity('');
+    });
+
+    phoneField.addEventListener('blur', () => {
+      sanitizeDigits(phoneField);
+      const val = phoneField.value;
+
+      if (val && val.length !== 11) {
+        phoneField.setCustomValidity('Mobile number must be exactly 11 digits.');
+      } else {
+        phoneField.setCustomValidity('');
+      }
+    });
+  });
+}
+
+/**
+ * Validate the date of birth field so only real past dates are accepted.
+ */
+function setupDobValidation() {
+  const dobField = document.getElementById('dob');
+  if (!dobField) return;
+
+  const minDate = '1900-01-01';
+  const today = new Date().toISOString().slice(0, 10);
+  dobField.min = minDate;
+  dobField.max = today;
+
+  const validateDob = () => {
+    const value = dobField.value;
+
+    if (!value) {
+      dobField.setCustomValidity('');
+      return;
     }
-  });
-  phoneField.addEventListener('input', () => {
-    phoneField.setCustomValidity('');
-  });
+
+    if (value < minDate) {
+      dobField.setCustomValidity('Please enter a valid date of birth after 1900.');
+      return;
+    }
+
+    if (value > today) {
+      dobField.setCustomValidity('Date of birth cannot be in the future.');
+      return;
+    }
+
+    dobField.setCustomValidity('');
+  };
+
+  dobField.addEventListener('input', validateDob);
+  dobField.addEventListener('change', validateDob);
+  dobField.addEventListener('blur', validateDob);
 }
 
 /**
@@ -258,7 +302,7 @@ function populateEligibilityReview() {
 
   list.innerHTML = '';
   checks.forEach((check) => {
-    const answered = wizard.querySelector(`input[name="${check.name}"]:checked`);
+    const answered = wizard.querySelector(`select[name="${check.name}"]`);
     const li = document.createElement('li');
     if (answered && answered.value === 'yes') {
       li.className = check.yesClass;
@@ -272,6 +316,27 @@ function populateEligibilityReview() {
     }
     list.appendChild(li);
   });
+}
+
+const PROGRAM_DESCRIPTIONS = {
+  'Supsup Todo': 'Best for mothers with a large daily surplus — ideal if you regularly produce more than 500 mL beyond your baby\'s needs.',
+  'Milky Way': 'For consistent donors who can commit to weekly or bi-weekly drop-offs of at least 100 mL per session.',
+  "Mom's Act": 'No commitment required — donate whenever you have milk to spare. Great for first-time or occasional donors.',
+};
+
+/**
+ * Show a compact description below the program select when a program is chosen
+ */
+function showProgramDescription(value) {
+  const descEl = document.getElementById('program-description');
+  if (!descEl) return;
+  const desc = PROGRAM_DESCRIPTIONS[value];
+  if (desc) {
+    descEl.textContent = desc;
+    descEl.style.display = 'block';
+  } else {
+    descEl.style.display = 'none';
+  }
 }
 
 /**
