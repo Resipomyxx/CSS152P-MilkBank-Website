@@ -1,0 +1,8 @@
+# ==========================================
+# Document Files
+# ==========================================
+# Ignore all Word documents anywhere in the project
+*.docx
+
+# Ignore all PDF files anywhere in the project
+*.pdf
