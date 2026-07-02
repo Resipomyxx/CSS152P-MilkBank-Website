@@ -38,7 +38,7 @@
       <nav class="site-nav" id="primary-navigation">
         <a href="index.html">Home</a>
         <a href="about.html">About Us</a>
-        <a href="donor.html">Donor Registration</a>
+        <a href="donor.html" style="display:none;">Donor Registration</a>
         <a href="history.html" style="display:none;">My Donations</a>
         <a href="staff.html" style="display:none;">Staff Dashboard</a>
         <a href="inventory.html" style="display:none;">Inventory</a>
@@ -54,7 +54,7 @@
             <h1>My Donations</h1>
             <p class="history-subtitle"><span id="donor-name">Loading...</span> · Donor since <span id="donor-since">...</span></p>
           </div>
-          <a class="button button-accent history-cta" href="donor.html">Schedule New Donation</a>
+          <button class="button button-accent history-cta" type="button" onclick="openScheduleModal()">Schedule New Donation</button>
         </div>
 
         <div class="history-stats" aria-label="Donation summary">
@@ -121,6 +121,98 @@
 
   <script src="script.js"></script>
   <script src="history.js"></script>
+
+  <!-- Schedule New Donation Modal -->
+  <div id="schedule-overlay" style="display:none; position:fixed; inset:0; background:rgba(23,49,59,0.45); backdrop-filter:blur(4px); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border-radius:20px; padding:2rem; width:min(460px, calc(100vw - 2rem)); box-shadow:0 24px 80px rgba(18,30,36,0.18); position:relative;">
+      <h2 style="margin:0 0 0.25rem; font-size:1.2rem; color:#17313b;">Schedule a Donation</h2>
+      <p style="margin:0 0 1.5rem; font-size:0.85rem; color:#5c6f74;">Choose a date and time for your next milk drop-off and we'll confirm with you shortly.</p>
+      <form id="schedule-form" onsubmit="submitSchedule(event)">
+        <div style="display:grid; gap:1rem;">
+          <label style="display:flex; flex-direction:column; gap:0.3rem; font-size:0.85rem; font-weight:600; color:#17313b;">
+            Preferred date
+            <input id="sched-date" type="date" required style="padding:0.55rem 0.75rem; border:1px solid rgba(23,49,59,0.2); border-radius:10px; font-size:0.9rem;" />
+          </label>
+          <label style="display:flex; flex-direction:column; gap:0.3rem; font-size:0.85rem; font-weight:600; color:#17313b;">
+            Preferred time
+            <input id="sched-time" type="time" required style="padding:0.55rem 0.75rem; border:1px solid rgba(23,49,59,0.2); border-radius:10px; font-size:0.9rem;" />
+          </label>
+          <label style="display:flex; flex-direction:column; gap:0.3rem; font-size:0.85rem; font-weight:600; color:#17313b;">
+            Estimated volume (mL)
+            <input id="sched-volume" type="number" min="1" placeholder="e.g. 150" style="padding:0.55rem 0.75rem; border:1px solid rgba(23,49,59,0.2); border-radius:10px; font-size:0.9rem;" />
+          </label>
+          <label style="display:flex; flex-direction:column; gap:0.3rem; font-size:0.85rem; font-weight:600; color:#17313b;">
+            Notes <span style="font-weight:400; color:#5c6f74;">(optional)</span>
+            <textarea id="sched-notes" rows="3" placeholder="Any details for our staff…" style="padding:0.55rem 0.75rem; border:1px solid rgba(23,49,59,0.2); border-radius:10px; font-size:0.9rem; resize:vertical; font-family:inherit;"></textarea>
+          </label>
+        </div>
+        <p id="schedule-error" style="display:none; color:#dc3545; font-size:0.83rem; margin:0.75rem 0 0;"></p>
+        <div style="display:flex; gap:0.75rem; margin-top:1.5rem; justify-content:flex-end;">
+          <button type="button" onclick="closeScheduleModal()" style="padding:0.55rem 1.2rem; border:1px solid rgba(23,49,59,0.2); border-radius:10px; background:#fff; font-size:0.875rem; cursor:pointer;">Cancel</button>
+          <button type="submit" id="schedule-submit" class="button button-accent" style="padding:0.55rem 1.4rem; border-radius:10px; font-size:0.875rem;">Confirm Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function openScheduleModal() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('sched-date').min = today;
+      document.getElementById('sched-date').value = '';
+      document.getElementById('sched-time').value = '';
+      document.getElementById('sched-volume').value = '';
+      document.getElementById('sched-notes').value = '';
+      document.getElementById('schedule-error').style.display = 'none';
+      const overlay = document.getElementById('schedule-overlay');
+      overlay.style.display = 'flex';
+    }
+
+    function closeScheduleModal() {
+      document.getElementById('schedule-overlay').style.display = 'none';
+    }
+
+    document.getElementById('schedule-overlay').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) closeScheduleModal();
+    });
+
+    async function submitSchedule(event) {
+      event.preventDefault();
+      const submitBtn = document.getElementById('schedule-submit');
+      const errorEl = document.getElementById('schedule-error');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Scheduling…';
+      errorEl.style.display = 'none';
+
+      const date = document.getElementById('sched-date').value;
+      const time = document.getElementById('sched-time').value;
+      const volume = document.getElementById('sched-volume').value;
+      const notes = document.getElementById('sched-notes').value.trim();
+
+      const scheduleNote = `Scheduled for ${date} at ${time}${notes ? ' — ' + notes : ''}`;
+
+      try {
+        const result = await window.supabase.recordDonation({
+          amount_ml: volume ? Number(volume) : 0,
+          notes: scheduleNote,
+          status: 'pending',
+        });
+
+        if (!result.success) throw new Error(result.error);
+
+        closeScheduleModal();
+        alert('Your donation has been scheduled! Our staff will confirm your appointment soon.');
+        // Reload the timeline to show the new entry
+        if (typeof initDonationHistory === 'function') initDonationHistory();
+      } catch (err) {
+        errorEl.textContent = 'Error: ' + (err.message || 'Could not schedule donation.');
+        errorEl.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Confirm Schedule';
+      }
+    }
+  </script>
 </body>
 </html>
 

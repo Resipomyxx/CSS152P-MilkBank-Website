@@ -586,11 +586,32 @@ async function getAllStaff() {
   }
 }
 
+/**
+ * Add a new inventory batch
+ * @param {object} batchData - batch_number, program, volume_available, expiry_date, status
+ * @returns {Promise<object>} Created batch or error
+ */
+async function addInventoryBatch(batchData) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('inventory')
+      .insert([batchData])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, batch: data };
+  } catch (error) {
+    console.error('Add inventory batch error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
 // Make functions available globally
 window.supabase = {
   signUp, signIn, signOut, getCurrentUser, getUserProfile, updateUserProfile,
   createDonorProfile, getActiveDonors, getCurrentUserDonor,
-  getInventory, getProducts, getProduct, addProduct, updateProductInventory,
+  getInventory, addInventoryBatch, getProducts, getProduct, addProduct, updateProductInventory,
   recordDonation, getUserDonationHistory, getAllDonations,
   createStaffMember, updateStaffMember, deleteStaffMember, getAllStaff
 };
