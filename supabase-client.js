@@ -172,6 +172,9 @@ async function createDonorProfile(donorData) {
     const user = await getCurrentUser();
     if (!user) throw new Error('No user logged in');
 
+    // Debug: confirm session user
+    console.log("Current session user:", user);
+
     const profileId = user.id;
     const personalInformation = donorData.personalInformation || {};
     const medicalHistory = donorData.medicalHistory || {};
@@ -232,6 +235,9 @@ async function createDonorProfile(donorData) {
 
     if (medicalHistoryError) throw medicalHistoryError;
 
+    //debugging part
+    console.log("Donor insert user_id:", user.id);
+
     const { data, error } = await supabaseClient
       .from('donors')
       .upsert([{
@@ -268,15 +274,25 @@ async function saveDonorProgramSelection(selectionData) {
     const donor = await getCurrentUserDonor();
     if (!donor) throw new Error('User is not a registered donor');
 
+    const { data: programData, error: programError } = await supabaseClient
+      .from('programs')
+      .select('id')
+      .eq('name', selectionData.program_name) // Match the text name from the HTML form
+      .single();
+
+    if (programError || !programData) {
+      throw new Error(`Could not find a valid program ID for "${selectionData.program_name}"`);
+    }
+
     const { data, error } = await supabaseClient
-      .from('donor_program_selections')
+      .from('program_selections')
       .upsert([{
         donor_id: donor.id,
-        program: selectionData.program || '',
+        program_id: programData.id,
         collection_type: selectionData.collection_type || '',
-        preferred_schedule: selectionData.preferred_schedule || '',
         donation_frequency: selectionData.donation_frequency || '',
-        program_notes: selectionData.program_notes || '',
+        preferred_schedule: selectionData.preferred_schedule || null, 
+        notes: selectionData.notes || '', 
         updated_at: new Date().toISOString()
       }], { onConflict: 'donor_id' })
       .select()
@@ -284,6 +300,7 @@ async function saveDonorProgramSelection(selectionData) {
 
     if (error) throw error;
     return { success: true, selection: data };
+
   } catch (error) {
     console.error('Save donor program selection error:', error);
     return { success: false, error: error.message };

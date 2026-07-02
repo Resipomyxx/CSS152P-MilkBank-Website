@@ -623,11 +623,11 @@ async function handleDonorRegistration(event) {
     }
 
     const programSelection = {
-      program: String(formData.get('donation_program') || '').trim(),
+      program_name: String(formData.get('donation_program') || '').trim(),
       collection_type: String(formData.get('collection_type') || '').trim(),
-      preferred_schedule: String(formData.get('preferred_schedule') || '').trim(),
+      preferred_schedule: `${formData.get('preferred_schedule')}:00+08`,
       donation_frequency: String(formData.get('donation_frequency') || '').trim(),
-      program_notes: String(formData.get('program_notes') || '').trim(),
+      notes: String(formData.get('program_notes') || '').trim(), 
     };
 
     const selectionResult = await window.supabase.saveDonorProgramSelection(programSelection);
