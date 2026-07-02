@@ -258,6 +258,39 @@ async function createDonorProfile(donorData) {
 }
 
 /**
+ * Save the donor's selected collection program and scheduling preferences.
+ * The backend should provide a donor_program_selections table linked to donors.
+ * @param {object} selectionData - program, collection_type, preferred_schedule, donation_frequency, program_notes
+ * @returns {Promise<object>} Saved selection or error
+ */
+async function saveDonorProgramSelection(selectionData) {
+  try {
+    const donor = await getCurrentUserDonor();
+    if (!donor) throw new Error('User is not a registered donor');
+
+    const { data, error } = await supabaseClient
+      .from('donor_program_selections')
+      .upsert([{
+        donor_id: donor.id,
+        program: selectionData.program || '',
+        collection_type: selectionData.collection_type || '',
+        preferred_schedule: selectionData.preferred_schedule || '',
+        donation_frequency: selectionData.donation_frequency || '',
+        program_notes: selectionData.program_notes || '',
+        updated_at: new Date().toISOString()
+      }], { onConflict: 'donor_id' })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, selection: data };
+  } catch (error) {
+    console.error('Save donor program selection error:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+/**
  * Get all active donors (public data)
  * @returns {Promise<array>} Array of donors or empty array
  */
@@ -610,7 +643,7 @@ async function addInventoryBatch(batchData) {
 // Make functions available globally
 window.supabase = {
   signUp, signIn, signOut, getCurrentUser, getUserProfile, updateUserProfile,
-  createDonorProfile, getActiveDonors, getCurrentUserDonor,
+  createDonorProfile, getActiveDonors, getCurrentUserDonor, saveDonorProgramSelection,
   getInventory, addInventoryBatch, getProducts, getProduct, addProduct, updateProductInventory,
   recordDonation, getUserDonationHistory, getAllDonations,
   createStaffMember, updateStaffMember, deleteStaffMember, getAllStaff

@@ -3,6 +3,8 @@
  * Handles the multi-step donor wizard form submission
  */
 
+window.REGISTRATION_DRAFT_KEY = window.REGISTRATION_DRAFT_KEY || 'lactocare.registrationDraft';
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -11,6 +13,111 @@ document.addEventListener('DOMContentLoaded', async () => {
     setupDonorWizard();
   }
 });
+
+function getRegistrationDraft() {
+  try {
+    const rawValue = sessionStorage.getItem(window.REGISTRATION_DRAFT_KEY);
+    return rawValue ? JSON.parse(rawValue) : null;
+  } catch (error) {
+    console.error('Read registration draft error:', error);
+    return null;
+  }
+}
+
+function saveRegistrationDraft(draftData) {
+  try {
+    sessionStorage.setItem(window.REGISTRATION_DRAFT_KEY, JSON.stringify(draftData));
+  } catch (error) {
+    console.error('Save registration draft error:', error);
+  }
+}
+
+function clearRegistrationDraft() {
+  try {
+    sessionStorage.removeItem(window.REGISTRATION_DRAFT_KEY);
+  } catch (error) {
+    console.error('Clear registration draft error:', error);
+  }
+}
+
+function buildRegistrationDraft() {
+  const form = document.querySelector('[data-donor-wizard]');
+  if (!form) return {};
+
+  const formData = new FormData(form);
+  return {
+    first_name: String(formData.get('first_name') || '').trim(),
+    last_name: String(formData.get('last_name') || '').trim(),
+    date_of_birth: String(formData.get('date_of_birth') || '').trim(),
+    email: String(formData.get('email') || '').trim(),
+    mobile_number: String(formData.get('mobile_number') || '').trim(),
+    emergency_contact_name: String(formData.get('emergency_contact_name') || '').trim(),
+    emergency_contact_number: String(formData.get('emergency_contact_number') || '').trim(),
+    address: String(formData.get('address') || '').trim(),
+    city: String(formData.get('city') || '').trim(),
+    province: String(formData.get('province') || '').trim(),
+    preferred_contact_method: String(formData.get('preferred_contact_method') || '').trim(),
+    program: String(formData.get('donation_program') || '').trim(),
+    collection_type: String(formData.get('collection_type') || '').trim(),
+    preferred_schedule: String(formData.get('preferred_schedule') || '').trim(),
+    donation_frequency: String(formData.get('donation_frequency') || '').trim(),
+    program_notes: String(formData.get('program_notes') || '').trim(),
+    q_lactating: formData.get('q_lactating') || '',
+    q_blood_test: formData.get('q_blood_test') || '',
+    q_chronic: formData.get('q_chronic') || '',
+    q_transfusion: formData.get('q_transfusion') || '',
+    q_medications: formData.get('q_medications') || '',
+    q_otc: formData.get('q_otc') || '',
+    q_tobacco: formData.get('q_tobacco') || '',
+    q_alcohol_drugs: formData.get('q_alcohol_drugs') || '',
+    q_tattoo: formData.get('q_tattoo') || '',
+    guidelines_acknowledged: formData.has('guidelines_acknowledged'),
+    information_accuracy: formData.has('information_accuracy'),
+    terms_acknowledged: formData.has('terms_acknowledged'),
+    activeStepIndex: Array.from(form.querySelectorAll('.donor-step')).findIndex(step => step.classList.contains('is-active'))
+  };
+}
+
+function restoreRegistrationDraft() {
+  const draft = getRegistrationDraft();
+  if (!draft) return;
+
+  const setValue = (selector, value) => {
+    const element = document.querySelector(selector);
+    if (!element || value === undefined || value === null || value === '') return;
+    element.value = value;
+  };
+
+  setValue('#first-name', draft.first_name);
+  setValue('#last-name', draft.last_name);
+  setValue('#dob', draft.date_of_birth);
+  setValue('#email', draft.email);
+  setValue('#phone', draft.mobile_number);
+  setValue('#emergency-name', draft.emergency_contact_name);
+  setValue('#emergency-phone', draft.emergency_contact_number);
+  setValue('#address', draft.address);
+  setValue('#city', draft.city);
+  setValue('#province', draft.province);
+  setValue('#preferred-contact', draft.preferred_contact_method);
+  setValue('#program', draft.program);
+  setValue('#collection-type', draft.collection_type);
+  setValue('#schedule', draft.preferred_schedule);
+  setValue('#frequency', draft.donation_frequency);
+  setValue('#program-notes', draft.program_notes);
+
+  const checkboxes = ['guidelines_acknowledged', 'information_accuracy', 'terms_acknowledged'];
+  checkboxes.forEach((name) => {
+    const checkbox = document.querySelector(`input[name="${name}"]`);
+    if (checkbox) checkbox.checked = Boolean(draft[name]);
+  });
+
+  const radioFields = ['q_lactating', 'q_blood_test', 'q_chronic', 'q_transfusion', 'q_medications', 'q_otc', 'q_tobacco', 'q_alcohol_drugs', 'q_tattoo'];
+  radioFields.forEach((name) => {
+    if (!draft[name]) return;
+    const radio = document.querySelector(`input[name="${name}"][value="${draft[name]}"]`);
+    if (radio) radio.checked = true;
+  });
+}
 
 /**
  * Initialize donor form - check login status and pre-fill if possible
@@ -32,7 +139,7 @@ async function initDonorForm() {
 
   // Already completed registration — send to donation history
   const donorRecord = await window.supabase.getCurrentUserDonor();
-  if (donorRecord) {
+  if (profile && profile.user_type === 'donor' && donorRecord) {
     window.location.href = 'history.html';
     return;
   }
@@ -42,6 +149,8 @@ async function initDonorForm() {
     emailField.value = user.email;
     emailField.disabled = true;
   }
+
+  restoreRegistrationDraft();
 }
 
 /**
@@ -54,6 +163,12 @@ function setupDonorWizard() {
   setupPhoneValidation();
   setupDobValidation();
   setupPasswordValidation();
+  restoreRegistrationDraft();
+
+  const persistDraft = () => saveRegistrationDraft(buildRegistrationDraft());
+
+  wizard.addEventListener('input', persistDraft);
+  wizard.addEventListener('change', persistDraft);
 
   wizard.addEventListener('click', (e) => {
     const button = e.target.closest('button[data-step-action]');
@@ -418,19 +533,14 @@ async function handleDonorRegistration(event) {
   const activeStep = wizard.querySelector('.donor-step.is-active');
   const stepIndex = steps.indexOf(activeStep);
   const totalSteps = steps.length;
-  const user = await window.supabase.getCurrentUser();
+  let user = await window.supabase.getCurrentUser();
 
   if (stepIndex < totalSteps - 1) {
+    saveRegistrationDraft(buildRegistrationDraft());
     nextStep();
     return;
   }
 
-  if (!user) {
-    window.location.href = 'login.html';
-    return;
-  }
-
-  // Validate final step fields (checkboxes etc.) before submitting
   if (typeof window.validateStep === 'function') {
     const valid = window.validateStep(activeStep);
     if (!valid) return;
@@ -439,6 +549,7 @@ async function handleDonorRegistration(event) {
   const form = document.querySelector('[data-donor-wizard]');
   const termsCheckbox = form.querySelector('input[name="terms_acknowledged"]');
   const eulaAccepted = termsCheckbox && termsCheckbox.checked;
+
   if (!eulaAccepted) {
     if (typeof window.showDonorEula === 'function') {
       window.showDonorEula();
@@ -448,38 +559,61 @@ async function handleDonorRegistration(event) {
 
   const submitBtn = event.target.querySelector('button[type="submit"]');
   const originalText = submitBtn?.textContent;
+
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Completing registration...';
   }
 
   const formData = new FormData(form);
-  const personalInformation = {
-    first_name: String(formData.get('first_name') || '').trim(),
-    last_name: String(formData.get('last_name') || '').trim(),
-    birthdate: String(formData.get('date_of_birth') || '').trim(),
-    email: String(formData.get('email') || user.email || '').trim(),
-    phone_number: String(formData.get('mobile_number') || '').trim(),
-    emergency_contact: String(formData.get('emergency_contact_name') || '').trim(),
-    street_address: String(formData.get('address') || '').trim(),
-    city: String(formData.get('city') || '').trim(),
-    region: String(formData.get('province') || '').trim(),
-    emergency_contact_number: String(formData.get('emergency_contact_number') || '').trim(),
-  };
-
-  const medicalHistory = {
-    q_lactating: formData.get('q_lactating') === 'yes',
-    q_blood_test: formData.get('q_blood_test') === 'yes',
-    q_chronic: formData.get('q_chronic') === 'yes',
-    q_transfusion: formData.get('q_transfusion') === 'yes',
-    q_medications: formData.get('q_medications') === 'yes',
-    q_otc: formData.get('q_otc') === 'yes',
-    q_tobacco: formData.get('q_tobacco') === 'yes',
-    q_alcohol_drugs: formData.get('q_alcohol_drugs') === 'yes',
-    q_tattoo: formData.get('q_tattoo') === 'yes',
-  };
 
   try {
+    if (!user) {
+      const email = String(formData.get('email') || '').trim();
+      const password = String(formData.get('password') || '');
+      const firstName = String(formData.get('first_name') || '').trim();
+      const lastName = String(formData.get('last_name') || '').trim();
+
+      if (!email || !password) {
+        throw new Error("Email and password are required to register.");
+      }
+
+      const authResult = await window.supabase.signUp(email, password, {
+        full_name: `${firstName} ${lastName}`.trim(),
+        user_type: 'donor'
+      });
+
+      if (!authResult.success) {
+        throw new Error(authResult.error);
+      }
+      
+    }
+
+    const personalInformation = {
+      first_name: String(formData.get('first_name') || '').trim(),
+      last_name: String(formData.get('last_name') || '').trim(),
+      birthdate: String(formData.get('date_of_birth') || '').trim(),
+      email: String(formData.get('email') || '').trim(), 
+      phone_number: String(formData.get('mobile_number') || '').trim(),
+      emergency_contact: String(formData.get('emergency_contact_name') || '').trim(),
+      street_address: String(formData.get('address') || '').trim(),
+      city: String(formData.get('city') || '').trim(),
+      region: String(formData.get('province') || '').trim(),
+      emergency_contact_number: String(formData.get('emergency_contact_number') || '').trim(),
+    };
+
+    const medicalHistory = {
+      q_lactating: formData.get('q_lactating') === 'yes',
+      q_blood_test: formData.get('q_blood_test') === 'yes',
+      q_chronic: formData.get('q_chronic') === 'yes',
+      q_transfusion: formData.get('q_transfusion') === 'yes',
+      q_medications: formData.get('q_medications') === 'yes',
+      q_otc: formData.get('q_otc') === 'yes',
+      q_tobacco: formData.get('q_tobacco') === 'yes',
+      q_alcohol_drugs: formData.get('q_alcohol_drugs') === 'yes',
+      q_tattoo: formData.get('q_tattoo') === 'yes',
+    };
+
     const result = await window.supabase.createDonorProfile({
       blood_type: '',
       status: 'active',
@@ -491,11 +625,25 @@ async function handleDonorRegistration(event) {
       throw new Error(result.error);
     }
 
+    const programSelection = {
+      program: String(formData.get('donation_program') || '').trim(),
+      collection_type: String(formData.get('collection_type') || '').trim(),
+      preferred_schedule: String(formData.get('preferred_schedule') || '').trim(),
+      donation_frequency: String(formData.get('donation_frequency') || '').trim(),
+      program_notes: String(formData.get('program_notes') || '').trim(),
+    };
+
+    const selectionResult = await window.supabase.saveDonorProgramSelection(programSelection);
+    if (!selectionResult.success) {
+      throw new Error(selectionResult.error);
+    }
+
+    clearRegistrationDraft();
     alert('Congratulations! Your donor profile has been created. You can now track your donations.');
     window.location.href = 'history.html';
 
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Registration Error:', error);
     alert('Error completing registration: ' + error.message);
   } finally {
     if (submitBtn) {
