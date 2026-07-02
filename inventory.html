@@ -51,15 +51,15 @@
         <div class="hero-copy reveal">
           <p class="eyebrow">Stock control</p>
           <h1>Track milk volume, expiry, and batch status at a glance.</h1>
-          <p class="hero-text">The mockup’s inventory flow becomes a clear staff page here, with batch rows, expiry alerts, and program split views.</p>
+          <p class="hero-text" id="inventory-hero-text">Loading live inventory summary…</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#table">View inventory</a>
             <a class="button button-secondary" href="staff.html">Back to staff</a>
           </div>
-          <ul class="hero-metrics" aria-label="Inventory highlights">
-            <li><strong>18</strong><span>active batches</span></li>
-            <li><strong>3,420 mL</strong><span>available stock</span></li>
-            <li><strong>3</strong><span>expiring soon</span></li>
+          <ul class="hero-metrics" id="inventory-highlights" aria-label="Inventory highlights">
+            <li><strong>—</strong><span>active batches</span></li>
+            <li><strong>—</strong><span>available stock</span></li>
+            <li><strong>—</strong><span>expiring soon</span></li>
           </ul>
         </div>
 
@@ -67,32 +67,17 @@
           <div class="glass-card hero-card hero-card-main">
             <p>Program split</p>
             <h2>Stock distributed across all active collection programs.</h2>
-            <div class="mini-grid">
+            <div class="mini-grid" id="program-split-grid">
               <article>
-                <span>Supsup Todo</span>
-                <strong>1,840 mL</strong>
-              </article>
-              <article>
-                <span>Milky Way</span>
-                <strong>1,200 mL</strong>
-              </article>
-              <article>
-                <span>Mom's Act</span>
-                <strong>380 mL</strong>
-              </article>
-              <article>
-                <span>Alerts</span>
-                <strong>3 batches</strong>
+                <span>Loading programs…</span>
+                <strong>—</strong>
               </article>
             </div>
           </div>
           <div class="glass-card hero-card hero-card-side">
             <p>Inventory notes</p>
-            <ul>
-              <li>Expiry monitoring</li>
-              <li>Ready-for-release batches</li>
-              <li>Low stock thresholds</li>
-              <li>Dispensing history</li>
+            <ul id="inventory-notes-list">
+              <li>Loading inventory notes…</li>
             </ul>
           </div>
         </div>
@@ -108,13 +93,16 @@
             if (err) {
               document.getElementById('inventory-body').innerHTML =
                 `<tr><td colspan="5" style="text-align:center;color:crimson">Error loading inventory: ${err.message || err}</td></tr>`;
+              renderHeroSummary([]);
               return;
             }
 
             renderTable(batches);
+            renderHeroSummary(batches);
           } catch (e) {
             document.getElementById('inventory-body').innerHTML =
               `<tr><td colspan="5" style="text-align:center;color:crimson">Error loading inventory: ${e.message || e}</td></tr>`;
+            renderHeroSummary([]);
             console.error('loadInventory error:', e);
           }
         }
@@ -122,20 +110,23 @@
         loadInventory();
 
         function renderTable(rows) {
+          const inventoryBody = document.getElementById('inventory-body');
+
           if (!rows || rows.length === 0) {
-            document.getElementById('inventory-body').innerHTML =
+            inventoryBody.innerHTML =
               '<tr><td colspan="5" style="text-align:center">No inventory records found.</td></tr>';
             return;
           }
 
           const today = new Date();
-          document.getElementById('inventory-body').innerHTML = rows.map(b => {
+          inventoryBody.innerHTML = rows.map(b => {
             const expiry = b.expiry_date ? new Date(b.expiry_date) : null;
             const daysLeft = expiry ? Math.ceil((expiry - today) / 86400000) : null;
             const expiryClass = daysLeft !== null && daysLeft <= 7 ? 'expiry-warn' : 'expiry-ok';
             const expiryText = expiry
               ? expiry.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' })
               : '—';
+            const statusText = b.status || 'Unknown';
 
             return `
               <tr>
@@ -143,9 +134,119 @@
                 <td>${b.program ?? '—'}</td>
                 <td>${b.volume_available ?? 0} mL</td>
                 <td><span class="${expiryClass}">${expiryText}</span></td>
-                <td><span class="status-pill s-${b.status.toLowerCase()}">${b.status}</span></td>
+                <td><span class="status-pill s-${String(statusText).toLowerCase()}">${statusText}</span></td>
               </tr>`;
           }).join('');
+        }
+
+        function renderHeroSummary(rows) {
+          const safeRows = Array.isArray(rows) ? rows : [];
+          const activeBatches = safeRows.filter((row) => {
+            const status = String(row.status || '').toLowerCase().trim();
+            return !['expired', 'rejected'].includes(status);
+          }).length;
+
+          const availableStock = safeRows.reduce((sum, row) => sum + Number(row.volume_available || 0), 0);
+          const expiringSoon = safeRows.filter((row) => isExpiringSoon(row)).length;
+
+          const heroText = document.getElementById('inventory-hero-text');
+          if (heroText) {
+            heroText.textContent = safeRows.length
+              ? `The inventory currently shows ${activeBatches} active batch${activeBatches === 1 ? '' : 'es'} with ${availableStock.toLocaleString()} mL available and ${expiringSoon} ${expiringSoon === 1 ? 'batch' : 'batches'} flagged for expiry soon.`
+              : 'No inventory rows are available yet, so the summary is waiting for live data.';
+          }
+
+          const highlights = document.getElementById('inventory-highlights');
+          if (highlights) {
+            highlights.innerHTML = `
+              <li><strong>${activeBatches}</strong><span>active batches</span></li>
+              <li><strong>${availableStock.toLocaleString()} mL</strong><span>available stock</span></li>
+              <li><strong>${expiringSoon}</strong><span>expiring soon</span></li>`;
+          }
+
+          const splitGrid = document.getElementById('program-split-grid');
+          if (splitGrid) {
+            const programTotals = safeRows.reduce((acc, row) => {
+              const program = String(row.program || 'Unassigned').trim() || 'Unassigned';
+              acc[program] = (acc[program] || 0) + Number(row.volume_available || 0);
+              return acc;
+            }, {});
+
+            const programEntries = Object.entries(programTotals)
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 3);
+
+            const cards = programEntries.length
+              ? programEntries.map(([program, total]) => `
+                  <article>
+                    <span>${escapeHtml(program)}</span>
+                    <strong>${formatVolume(total)}</strong>
+                  </article>`).join('')
+              : '<article><span>Programs</span><strong>No data yet</strong></article>';
+
+            const alertsCard = expiringSoon
+              ? `<article><span>Alerts</span><strong>${expiringSoon} batches</strong></article>`
+              : '';
+
+            splitGrid.innerHTML = cards + alertsCard;
+          }
+
+          const notesList = document.getElementById('inventory-notes-list');
+          if (notesList) {
+            const notes = buildInventoryNotes(safeRows, expiringSoon, activeBatches, availableStock);
+            notesList.innerHTML = notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('');
+          }
+        }
+
+        function isExpiringSoon(row) {
+          const expiry = row.expiry_date ? new Date(row.expiry_date) : null;
+          if (!expiry || Number.isNaN(expiry.getTime())) return false;
+
+          const today = new Date();
+          const daysLeft = Math.ceil((expiry - today) / 86400000);
+          const status = String(row.status || '').toLowerCase().trim();
+
+          return daysLeft >= 0 && daysLeft <= 7 && !['expired', 'rejected'].includes(status);
+        }
+
+        function buildInventoryNotes(rows, expiringSoon, activeBatches, availableStock) {
+          if (!rows.length) {
+            return ['Inventory data will appear here once batches are recorded.'];
+          }
+
+          const readyBatches = rows.filter((row) => {
+            const status = String(row.status || '').toLowerCase().trim();
+            return ['ready', 'dispensed', 'distributed'].includes(status);
+          }).length;
+
+          const lowStockPrograms = Object.entries(rows.reduce((acc, row) => {
+            const program = String(row.program || 'Unassigned').trim() || 'Unassigned';
+            acc[program] = (acc[program] || 0) + Number(row.volume_available || 0);
+            return acc;
+          }, {}))
+            .filter(([, total]) => total < 500)
+            .map(([program]) => program);
+
+          const notes = [];
+          if (expiringSoon) notes.push(`${expiringSoon} ${expiringSoon === 1 ? 'batch is' : 'batches are'} approaching expiry.`);
+          if (readyBatches) notes.push(`${readyBatches} ${readyBatches === 1 ? 'batch is' : 'batches are'} ready for release.`);
+          if (lowStockPrograms.length) notes.push(`${lowStockPrograms.slice(0, 2).join(', ')} ${lowStockPrograms.length === 1 ? 'is' : 'are'} running low.`);
+          notes.push(`${activeBatches} active batches are currently tracked with ${availableStock.toLocaleString()} mL available.`);
+
+          return notes;
+        }
+
+        function formatVolume(value) {
+          return `${Number(value || 0).toLocaleString()} mL`;
+        }
+
+        function escapeHtml(value) {
+          return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\"/g, '&quot;')
+            .replace(/'/g, '&#39;');
         }
       </script>
 
