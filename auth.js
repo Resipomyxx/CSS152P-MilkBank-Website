@@ -137,7 +137,7 @@ async function handleLogin(event) {
           redirectUrl = 'staff.html';
           break;
         case 'donor':
-          redirectUrl = 'donor.html';
+          redirectUrl = 'history.html';
           break;
         default:
           redirectUrl = 'index.html';
@@ -221,15 +221,15 @@ async function updateAuthUI() {
   if (user) {
     authLinks.forEach(el => el.style.display = 'none');
     protectedLinks.forEach(el => el.style.display = 'block');
-    
+
     // Update role-based navigation visibility
     updateNavVisibility(userType);
-    
+
     // Special handling for staff dashboard title if admin
     if (userType === 'admin') {
       const staffDashLink = document.querySelector('a[href="staff.html"]');
       if (staffDashLink) staffDashLink.textContent = 'Admin Dashboard';
-      
+
       const dashTitle = document.querySelector('.site-header small');
       if (dashTitle && window.location.pathname.includes('staff.html')) {
         dashTitle.textContent = 'Admin Dashboard';
@@ -240,6 +240,7 @@ async function updateAuthUI() {
     protectedLinks.forEach(el => el.style.display = 'none');
     updateNavVisibility('guest');
   }
+
 }
 
 /**
@@ -252,18 +253,21 @@ function updateNavVisibility(userType) {
   const hide = (selector) => document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
 
   if (userType === 'donor') {
-    show('a[href="history.html"]');         // My Donations — donors only
-    hide('a[href="staff.html"]');            // Staff Dashboard — hidden
-    hide('a[href="inventory.html"]');        // Inventory — hidden
-    show('a[href="donor.html"]');
+    show('a[href="history.html"]');          // My Donations — donors only
+    hide('a[href="donor.html"]');            // Donor Registration — hidden once registered
+    hide('a[href="staff.html"]');
+    hide('a[href="inventory.html"]');
+    hide('a[href="donor-registration.html"]');
   } else if (userType === 'staff' || userType === 'admin') {
-    hide('a[href="history.html"]');          // My Donations — hidden for staff
+    hide('a[href="history.html"]');
+    hide('a[href="donor.html"]');
     show('a[href="staff.html"]');            // Staff Dashboard — staff/admin only
     show('a[href="inventory.html"]');        // Inventory — staff/admin only
-    hide('a[href="donor.html"]');
+    hide('a[href="donor-registration.html"]');
   } else {
-    // Guest — keep restricted links hidden (already hidden by default in HTML)
+    // Guest — show Donor Registration, keep role-restricted links hidden
     hide('a[href="history.html"]');
+    show('a[href="donor.html"]');            // Donor Registration — visible for guests
     hide('a[href="staff.html"]');
     hide('a[href="inventory.html"]');
   }

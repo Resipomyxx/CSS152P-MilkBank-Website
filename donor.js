@@ -127,6 +127,8 @@ async function initDonorForm() {
 
   if (!user) {
     console.log('Guest user: donor registration available without prior login.');
+    restoreRegistrationDraft();
+    return;
   }
 
   const profile = await window.supabase.getUserProfile();
@@ -135,6 +137,7 @@ async function initDonorForm() {
     return;
   }
 
+  // Already completed registration — send to donation history
   const donorRecord = await window.supabase.getCurrentUserDonor();
   if (profile && profile.user_type === 'donor' && donorRecord) {
     window.location.href = 'history.html';
